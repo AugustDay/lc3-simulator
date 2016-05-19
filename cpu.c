@@ -140,7 +140,7 @@ Register getSext(CPU_p cpu) {
 Byte getOPCODE (CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & OPCODE_MASK;
-	temp = temp >> 12;
+	temp = temp >> 13;
 	return (Byte) temp;
 }
 
