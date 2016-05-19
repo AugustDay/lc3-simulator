@@ -16,12 +16,17 @@
 
 #define NO_OF_REGISTERS 8
 
-#define OPCODE_MASK 0xE000
+#define OPCODE_MASK 0xF000
+
 #define RD_MASK 0x1C00
 #define RS_MASK 0x0380
-#define IMMED_MASK 0x007F
+#define SR2_MASK 0x0003
+#define IMMED_MASK 0x001F
+#define PCOFFSET9_MASK 0x01FF
 #define SIGN_MASK 0x0040  
 #define NEG_SIGN_EXTEND 0xFFC0 
+
+
 
 #define HALT 7
 #define ADD 0
