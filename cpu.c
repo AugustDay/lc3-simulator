@@ -140,7 +140,7 @@ Register getSext(CPU_p cpu) {
 Byte getOPCODE (CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & OPCODE_MASK;
-	temp = temp >> 13;
+	temp = temp >> 12;
 	return (Byte) temp;
 }
 
@@ -175,6 +175,90 @@ Byte getRS (CPU_p cpu) {
 	temp = temp >> 7;
 	return (Byte) temp;
 }
+
+/* Gets DR of a given CPU from the current ir
+   IN: pointer to a CPU
+   OUT: Byte Dr, POINTER_ERROR returned if given CPU is null
+*/   
+Byte getDR (CPU_p cpu) {
+	if (cpu == NULL) return POINTER_ERROR;
+	Register temp = cpu->ir & DR_MASK;
+	temp = temp >> 9;
+	return (Byte) temp;
+}
+
+/* Gets SR1 of a given CPU from the current ir
+   IN: pointer to a CPU
+   OUT: Byte Sr1, POINTER_ERROR returned if given CPU is null
+*/
+Byte getSR1 (CPU_p cpu) {
+	if (cpu == NULL) return POINTER_ERROR;
+	Register temp = cpu->ir & SR1_MASK;
+	temp = temp >> 6;
+	return (Byte) temp;
+}
+
+/* Gets SR2 of a given CPU from the current ir
+   IN: pointer to a CPU
+   OUT: Byte Sr2, POINTER_ERROR returned if given CPU is null
+*/
+Byte getSR2 (CPU_p cpu) {
+	if (cpu == NULL) return POINTER_ERROR;
+	Register temp = cpu->ir & SR2_MASK;
+	return (Byte) temp;
+}
+
+/* Gets Immed5 of a given CPU from the current ir
+   IN: pointer to a CPU
+   OUT: Byte Immed5, POINTER_ERROR returned if given CPU is null
+*/
+Byte getImmed5 (CPU_p cpu) {
+	if (cpu == NULL) return POINTER_ERROR;
+	Register temp = cpu->ir & IMMED5_MASK;
+	return (Byte) temp;
+}
+ 
+/* Gets PCoffset9 of a given CPU from the current ir
+   IN: pointer to a CPU
+   OUT: Byte PCoffset9, POINTER_ERROR returned if given CPU is null
+*/
+Byte getPCoffset9 (CPU_p cpu) {
+	if (cpu == NULL) return POINTER_ERROR;
+	Register temp = cpu->ir & PCOFFSET9_MASK;
+	return (Byte) temp;
+}
+ 
+/* Gets Offset6 of a given CPU from the current ir
+   IN: pointer to a CPU
+   OUT: Byte offset6, POINTER_ERROR returned if given CPU is null
+*/
+Byte getOffset6 (CPU_p cpu) {
+	if (cpu == NULL) return POINTER_ERROR;
+	Register temp = cpu->ir & OFFSET6_MASK;
+	return (Byte) temp;
+}
+
+/* Gets BaseR of a given CPU from the current ir
+   IN: pointer to a CPU
+   OUT: Byte BaseR, POINTER_ERROR returned if given CPU is null
+*/
+Byte getBaseR (CPU_p cpu) {
+	if (cpu == NULL) return POINTER_ERROR;
+	Register temp = cpu->ir & BASER_MASK;
+	temp = temp >> 6;
+	return (Byte) temp;
+}
+
+/* Gets Trapvect8 of a given CPU from the current ir
+   IN: pointer to a CPU
+   OUT: Byte Trapvect8, POINTER_ERROR returned if given CPU is null
+*/
+Byte getTrapvect8 (CPU_p cpu) {
+	if (cpu == NULL) return POINTER_ERROR;
+	Register temp = cpu->ir & TRAPVECT8_MASK;
+	return (Byte) temp;	
+}
+
 
 /* Sets a given CPU's ir Register
    IN: pointer to a CPU, char input to set
