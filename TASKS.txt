@@ -1,0 +1,14 @@
+ADD(i) 	-Arthur
+AND(i) 	-Arthur
+JMP 	-Arthur
+LD 		-Arthur
+NOT 	-Arthur
+ST 		-Arthur
+
+ADD 	-Austin
+AND 	-Austin
+BR 		-Austin
+JSR		-Austin
+LEA		-Austin
+RET 	-Austin
+TRAP 	-Austin
