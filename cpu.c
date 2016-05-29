@@ -2,7 +2,7 @@
 	cpu.c
 	
 	Programmer: George Mobus
-   Austin Ingraham
+   Austin Ingraham, Arthur Panlilio
 	Date: 4/20/16
 	Descritption:
 		This file contains the implementation code for the CPU class.

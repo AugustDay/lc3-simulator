@@ -2,10 +2,10 @@
     cpu.h
 	
     Programer: George Mobus
-    Austin Ingraham
-	Date: 4/20/16
-	Description:
-		This header file contains the definitions for the CPU object.
+    Austin Ingraham, Arthur Panlilio
+	 Date: 4/20/16
+	 Description:
+	   This header file contains the definitions for the CPU object.
 */
 
 #ifndef _CPU_H_
@@ -17,8 +17,6 @@
 #define NO_OF_REGISTERS 8
 
 #define OPCODE_MASK 0xF000
-<<<<<<< HEAD
-
 #define DR_MASK 0x0E00
 #define SR1_MASK 0x01C0
 #define SR2_MASK 0x0003
@@ -29,17 +27,11 @@
 #define BASER_MASK 0x01C0
 #define TRAPVECT8_MASK 0x00FF
 
-=======
 #define RD_MASK 0x1C00
 #define RS_MASK 0x0380
 #define IMMED_MASK 0x007F
->>>>>>> refs/remotes/origin/master
 #define SIGN_MASK 0x0040  
 #define NEG_SIGN_EXTEND 0xFFC0 
-
-#define RD_MASK 0x1C00
-#define RS_MASK 0x0380 
-#define IMMED_MASK 0x007F
 
 #define HALT 7
 #define ADD 0
