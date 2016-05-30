@@ -167,7 +167,7 @@ int controller (CPU_p cpu) {
                 opcode = getOPCODE(cpu);			    
                 rd = getRD(cpu);
                 rs = getRS(cpu);
-                setSext(cpu);
+                setSext(cpu, 1);
               
                 printf("op = %d, rd = %d, rs = %d, sext = %d", opcode, rd, rs, getSext(cpu));
                 state = EVAL_ADDR;
@@ -310,6 +310,7 @@ int main (int argc, char *argv[]) {
    //PREPARE CPU 
    CPU_p cpu = constructCPU();
 	initCPU(cpu);
+
   
    if(controller(cpu) == 1) {
 		printf("Operations completed successfully.\n");	

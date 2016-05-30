@@ -218,16 +218,6 @@ Byte getImmed5(CPU_p cpu) {
 	return (Byte) temp;
 }
  
-/* Gets PCoffset9 of a given CPU from the current ir
-   IN: pointer to a CPU
-   OUT: Byte PCoffset9, POINTER_ERROR returned if given CPU is null
-*/
-Byte getPCoffset9(CPU_p cpu) {
-	if (cpu == NULL) return POINTER_ERROR;
-	Register temp = cpu->ir & PCOFFSET9_MASK;
-	return (Byte) temp;
-}
- 
 /* Gets Offset6 of a given CPU from the current ir
    IN: pointer to a CPU
    OUT: Byte offset6, POINTER_ERROR returned if given CPU is null
@@ -235,6 +225,26 @@ Byte getPCoffset9(CPU_p cpu) {
 Byte getOffset6(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & OFFSET6_MASK;
+	return (Byte) temp;
+}
+
+/* Gets PCoffset9 of a given CPU from the current ir
+   IN: pointer to a CPU
+   OUT: Byte PCoffset9, POINTER_ERROR returned if given CPU is null
+*/
+Byte getOffset9(CPU_p cpu) {
+	if (cpu == NULL) return POINTER_ERROR;
+	Register temp = cpu->ir & OFFSET9_MASK;
+	return (Byte) temp;
+}
+
+/* Gets PCoffset11 of a given CPU from the current ir
+   IN: pointer to a CPU
+   OUT: Byte PCoffset11, POINTER_ERROR returned if given CPU is null
+*/
+Byte getOffset11(CPU_p cpu) {
+	if (cpu == NULL) return POINTER_ERROR;
+	Register temp = cpu->ir & OFFSET11_MASK;
 	return (Byte) temp;
 }
 
@@ -282,17 +292,47 @@ int setIR(CPU_p cpu, char* input) {
 }
 
 /* Sets a given CPU's sign-extended (sext) Register
-   IN: pointer to a CPU
+   IN: pointer to a CPU, value code for what offset to set
    OUT: 1 if set operation is successful, -1 if POINTER_ERROR
  */
-int setSext(CPU_p cpu) {
+int setSext(CPU_p cpu, int signLocation) {
    if (cpu == NULL) return POINTER_ERROR;
-   Register immed = getImmed(cpu);
-   if (immed & SIGN_MASK) {
-      cpu->sext = immed | NEG_SIGN_EXTEND;
-   } else {
-      cpu->sext = immed;  
+   Register immed;
+   switch (signLocation) {
+      case IMMED5_SIGN:
+         immed = getImmed5(cpu);
+         if (immed & IMMED5_SIGN_MASK) {
+            cpu->sext = immed | IMMED5_SIGN_EXTEND;
+         } else {
+            cpu->sext = immed;  
+         }
+         break;
+      case OFFSET6_SIGN:
+         immed = getOffset6(cpu);
+         if (immed & OFFSET6_SIGN_MASK) {
+            cpu->sext = immed | OFFSET6_SIGN_EXTEND;
+         } else {
+            cpu->sext = immed;  
+         }
+         break;
+      case OFFSET9_SIGN:
+         immed = getOffset9(cpu);
+         if (immed & OFFSET9_SIGN_MASK) {
+            cpu->sext = immed | OFFSET9_SIGN_EXTEND;
+         } else {
+            cpu->sext = immed;  
+         }
+         break;
+      case OFFSET11_SIGN:
+         immed = getOffset11(cpu);
+         if (immed & OFFSET11_SIGN_MASK) {
+            cpu->sext = immed | OFFSET11_SIGN_EXTEND;
+         } else {
+            cpu->sext = immed;  
+         }
+         break;
    }
+   
 	return 1;
 }
 

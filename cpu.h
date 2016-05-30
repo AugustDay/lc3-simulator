@@ -22,8 +22,9 @@
 #define SR2_MASK 0x0003
 
 #define IMMED5_MASK 0x001F
-#define PCOFFSET9_MASK 0x01FF
 #define OFFSET6_MASK 0x003F
+#define OFFSET9_MASK 0x01FF
+#define OFFSET11_MASK 0x07FF
 #define BASER_MASK 0x01C0
 #define TRAPVECT8_MASK 0x00FF
 #define BIT5_MASK 0x0020
@@ -56,6 +57,23 @@
 #define LEA 14
 #define NOT 9
 #define TRAP 15
+
+/* Sign-Extension codes */
+#define IMMED5_SIGN 0
+#define IMMED5_SIGN_MASK 0x0010
+#define IMMED5_SIGN_EXTEND 0xFFF0
+
+#define OFFSET6_SIGN 1
+#define OFFSET6_SIGN_MASK 0x0020
+#define OFFSET6_SIGN_EXTEND 0xFFE0
+
+#define OFFSET9_SIGN 2
+#define OFFSET9_SIGN_MASK 0x0100
+#define OFFSET9_SIGN_EXTEND 0xFF00
+
+#define OFFSET11_SIGN 3
+#define OFFSET11_SIGN_MASK 0x0400
+#define OFFSET11_SIGN_EXTEND 0xFC00
 
 
 typedef unsigned short Register;
@@ -92,7 +110,7 @@ CPU_p constructCPU(void);
 int initCPU (CPU_p);
 
 int setIR (CPU_p, char*);
-int setSext(CPU_p);
+int setSext(CPU_p, int);
 int setRegisters(CPU_p, char*, char*);
 int setRegister(CPU_p, unsigned int, int);
 Byte setZeroFlag(CPU_p);
@@ -106,8 +124,9 @@ Byte getRS(CPU_p);
 Byte getSR1(CPU_p);
 Byte getSR2(CPU_p);
 Byte getImmed5(CPU_p);
-Byte getPCoffset9(CPU_p);
 Byte getOffset6(CPU_p);
+Byte getOffset9(CPU_p);
+Byte getOffset11(CPU_p);
 Byte getBaseR(CPU_p);
 Byte getTrapvect8(CPU_p);
 Byte getBit5(CPU_p);
