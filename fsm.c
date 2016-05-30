@@ -146,7 +146,7 @@ int controller (CPU_p cpu) {
     if (cpu->alu == NULL) return POINTER_ERROR;
 	 unsigned int state = FETCH;
 	 Register branchAddress;
-	 Byte opcode = 0, rd = 0, rs = 0;
+	 Byte opcode = 0, dr = 0, sr1 = 0, sr2 = 0, bit5 = 0;
 	
 	 initMemory();
 	 initRegisters(cpu);
@@ -165,31 +165,28 @@ int controller (CPU_p cpu) {
             case DECODE:
                 printf("DECODE: ");
                 opcode = getOPCODE(cpu);			    
-                rd = getRD(cpu);
-                rs = getRS(cpu);
-                setSext(cpu, 1);
+                dr = getDR(cpu);
+                sr1 = getSR1(cpu);
               
-                printf("op = %d, rd = %d, rs = %d, sext = %d", opcode, rd, rs, getSext(cpu));
+                printf("op = %d, dr = %d, sr1 = %d", opcode, dr, sr1);
                 state = EVAL_ADDR;
                 break;
             case EVAL_ADDR:
               	 printf("\nEVAL_ADDRESS: ");
                 switch (opcode) {
                    case ADD: break;
-                   case ADI: break;
-                   case NAND: break;
                    case LDI: break;
                    case LD:
-                      cpu->mar = getRegister(cpu, rs) + getSext(cpu);
-                      printf("mar = %d", cpu->mar);
+                     /* cpu->mar = getRegister(cpu, rs) + getSext(cpu);
+                      printf("mar = %d", cpu->mar); */
                       break;
                    case ST:
-                      cpu->mar = getRegister(cpu, rd) + getSext(cpu);
-                      printf("mar = %d", cpu->mar);
+                     /* cpu->mar = getRegister(cpu, rd) + getSext(cpu);
+                      printf("mar = %d", cpu->mar); */
                       break;
                    case BNZ:
-                      branchAddress = cpu->pc + getSext(cpu);
-                      printf("branchAddress = %d", branchAddress);
+                     /* branchAddress = cpu->pc + getSext(cpu);
+                      printf("branchAddress = %d", branchAddress); */
                       break;
                    case HALT: break;
                 }
@@ -200,28 +197,29 @@ int controller (CPU_p cpu) {
 				  	 printf("\nFETCH_OP: ");
 				    switch (opcode) {
                    case ADD:
-                   case NAND: 
-                      cpu->alu->a = getRegister(cpu, rd);	// get first operand
-                      cpu->alu->b = getRegister(cpu, rs);	// get second operand
-                      printf("ALU_A = %d, ALU_B = %d", getALU_A(cpu->alu), getALU_B(cpu->alu));
+                        bit5 = getBit5(cpu);
+                        if(bit5) { //ADD(I)
+                           setSext(cpu, IMMED5_SIGN);
+                           cpu->alu->a = getRegister(cpu, sr1);	// get first operand
+                           cpu->alu->b = getSext(cpu); // get second operand 
+                        } else { //Standard Add
+                           sr2 = getSR2(cpu);
+                           cpu->alu->a = getRegister(cpu, sr1);	// get first operand
+                           cpu->alu->b = getRegister(cpu, sr2);	// get second operand
+                        }                      
+                      printf("ALU_A = %d, ALU_B = %d", getALU_A(cpu->alu), getALU_B(cpu->alu)); 
                       break; 
-                   case ADI: 
-                      cpu->alu->a = getRegister(cpu, rd);	// get first operand
-                      cpu->alu->b = getSext(cpu);			// get second operand
-                      printf("ALU_A = %d, ALU_B = %d", getALU_A(cpu->alu), getALU_B(cpu->alu));
-                      break;
                    case LD: 
-                      printf("mdr = memory[%d] = 0x%.4X", cpu->mdr, memory[cpu->mdr]);
-                      cpu->mdr = memory[cpu->mdr];
-                      
+                     /* printf("mdr = memory[%d] = 0x%.4X", cpu->mdr, memory[cpu->mdr]);
+                      cpu->mdr = memory[cpu->mdr]; */                      
                       break;
                    case LDI: 
-                      cpu->mdr = getSext(cpu);
-                      printf("mdr = 0x%.4X", cpu->mdr);
+                     /* cpu->mdr = getSext(cpu);
+                      printf("mdr = 0x%.4X", cpu->mdr); */
                       break;
                    case ST: 
-                      cpu->mdr = getRegister(cpu, rs);
-                      printf("mdr = 0x%.4X", cpu->mdr);
+                     /* cpu->mdr = getRegister(cpu, rs);
+                      printf("mdr = 0x%.4X", cpu->mdr); */
                       break;
                    case BNZ: break;
                    case HALT: break;
@@ -233,33 +231,29 @@ int controller (CPU_p cpu) {
 				    printf("\nEXECUTE: ");
                 switch (opcode) {
 						 case ADD: 
-							 printf("ADD 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
+                      if(bit5) {
+                         printf("ADD(I) 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
+                      } else {
+							    printf("ADD 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
+                      }
 						    alu_ADD(cpu);
-							 break;
-						 case ADI: 
-							 printf("ADI 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
-							 alu_ADI(cpu);
-							 break;
-						 case NAND: 
-							 printf("NAND 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
-                      alu_NAND(cpu);  
 							 break;
                    case LDI: break;
                    case LD: 
-                      cpu->mdr = memory[cpu->mar];
-                      printf("mdr = 0x%.4X", cpu->mdr);
+                     /* cpu->mdr = memory[cpu->mar];
+                      printf("mdr = 0x%.4X", cpu->mdr); */
                       break;
                    case ST:
-                      memory[cpu->mar] = cpu->mdr;
-                      printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr);
+                     /* memory[cpu->mar] = cpu->mdr;
+                      printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); */
                       break;
                    case BNZ:                     
-                      if (cpu->zero) {                         
+                     /* if (cpu->zero) {                         
                          cpu->pc = branchAddress;
                          printf("Branch taken.");
                       } else {
                          printf("Branch not taken.");  
-                      }
+                      } */
                       break;
                    case HALT: 
                       printf("HALT");
@@ -272,15 +266,13 @@ int controller (CPU_p cpu) {
 				    printf("\nSTORE: ");
                 switch (opcode) {
                    case ADD: 
-                   case ADI:
-                   case NAND:
-                      setRegister(cpu, getALU_R(cpu->alu), rd); 
-                      printf("reg_file[%d] = 0x%.4X", rd, getALU_R(cpu->alu));
+                      setRegister(cpu, getALU_R(cpu->alu), dr); 
+                      printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu)); 
                       break;
                    case LDI:
                    case LD:
-                      cpu->reg_file[rd] = cpu->mdr;
-                      printf("reg_file[%d] = 0x%.4X", rd, cpu->mdr);
+                    /*  cpu->reg_file[rd] = cpu->mdr;
+                      printf("reg_file[%d] = 0x%.4X", rd, cpu->mdr); */
                       break;
                    case ST: break;
                    case BNZ: break;
@@ -289,8 +281,9 @@ int controller (CPU_p cpu) {
                 printf("\n===========\n");
 					 
                 //zero-out everything                          
-                rd = 0;
-                rs = 0;
+                dr = 0;
+                sr1 = 0;
+                sr2 = 0;
                 opcode = 0;
                 cpu->alu->a = 0;
                 cpu->alu->b = 0;

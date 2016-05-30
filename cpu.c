@@ -154,28 +154,6 @@ Register getRegister(CPU_p cpu, int index) {
    return cpu->reg_file[index];
 }
 
-/* Gets Rd of a given CPU from the current ir
-   IN: pointer to a CPU
-   OUT: Byte Rd, POINTER_ERROR returned if given CPU is null
- */
-Byte getRD (CPU_p cpu) {
-	if (cpu == NULL) return POINTER_ERROR;
-	Register temp = cpu->ir & RD_MASK;
-	temp = temp >> 10;
-	return (Byte) temp;
-}
-
-/* Gets Rs of a given CPU from the current ir
-   IN: pointer to a CPU
-   OUT: Byte Rd, POINTER_ERROR returned if given CPU is null
- */
-Byte getRS (CPU_p cpu) {
-	if (cpu == NULL) return POINTER_ERROR;
-	Register temp = cpu->ir & RS_MASK;
-	temp = temp >> 7;
-	return (Byte) temp;
-}
-
 /* Gets DR of a given CPU from the current ir
    IN: pointer to a CPU
    OUT: Byte Dr, POINTER_ERROR returned if given CPU is null
@@ -336,17 +314,6 @@ int setSext(CPU_p cpu, int signLocation) {
 	return 1;
 }
 
-/* Sets a given CPU's Registers based on cpu->ir index
-   IN: pointer to a CPU, char input to set
-   OUT: 1 if set operation is successful, -1 if POINTER_ERROR
- */
-int setRegisters(CPU_p cpu, char* Rd_input, char* Rs_input) {
-   if (cpu == NULL) return POINTER_ERROR;
-   cpu->reg_file[getRD(cpu)] = strtol(Rd_input, NULL, 16);
-   cpu->reg_file[getRS(cpu)] = strtol(Rs_input, NULL, 16);
-   return 1; 
-}
-
 /* Sets a given CPU's Register at given index
    IN: pointer to a CPU, unsigned integer input to set, index of register
    OUT: 1 if set operation is successful, -1 if POINTER_ERROR
@@ -384,24 +351,3 @@ void displayByteBinary(Byte theB) {
     }
    printf("\n");
 }
-
-/* Driver for CPU 
-int main (int argc, char *argv[]) {
-	if (argc < 5) {
-		printf ("Invalid input to program\n");
-		exit (0);
-	}
-   
-   //PREPARE CPU
-   CPU_p cpu = constructCPU();
-	initCPU(cpu);
-   setIR(cpu, argv[2]);
-   
-   displayRegisterBinary(cpu->ir);
-   
-   //PERFORM OPERATIONS
-   setRegisters(cpu, argv[3], argv[4]);
-   operate(cpu);
-   return 0;
-} */
-

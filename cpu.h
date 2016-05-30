@@ -36,9 +36,6 @@
 #define NEG_SIGN_EXTEND 0xFFC0 
 
 /* Old OPCODES */
-//#define ADD 0
-#define ADI 20
-#define NAND 2
 #define LDI 3
 #define LD 4
 #define ST 5
@@ -111,7 +108,6 @@ int initCPU (CPU_p);
 
 int setIR (CPU_p, char*);
 int setSext(CPU_p, int);
-int setRegisters(CPU_p, char*, char*);
 int setRegister(CPU_p, unsigned int, int);
 Byte setZeroFlag(CPU_p);
 Register getIR(CPU_p);
@@ -119,8 +115,7 @@ Register getSext(CPU_p);
 Register getRegister(CPU_p, int);
 Register getImmed(CPU_p);
 Byte getOPCODE(CPU_p);
-Byte getRD(CPU_p);
-Byte getRS(CPU_p);
+Byte getDR (CPU_p);
 Byte getSR1(CPU_p);
 Byte getSR2(CPU_p);
 Byte getImmed5(CPU_p);
