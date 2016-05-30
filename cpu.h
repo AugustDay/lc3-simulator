@@ -26,6 +26,7 @@
 #define OFFSET6_MASK 0x003F
 #define BASER_MASK 0x01C0
 #define TRAPVECT8_MASK 0x00FF
+#define BIT5_MASK 0x0020
 
 #define RD_MASK 0x1C00
 #define RS_MASK 0x0380
@@ -33,14 +34,29 @@
 #define SIGN_MASK 0x0040  
 #define NEG_SIGN_EXTEND 0xFFC0 
 
-#define HALT 7
-#define ADD 0
-#define ADI 1 
+/* Old OPCODES */
+//#define ADD 0
+#define ADI 20
 #define NAND 2
 #define LDI 3
 #define LD 4
 #define ST 5
 #define BNZ 6
+#define HALT 7
+
+/* New OPCODES, in order they appear on Page 119 of textbook */
+#define ADD 1
+     // ADD(I) <- flag bit (index 5) determines operation 
+#define AND 5
+     // AND(I) <- flag bit determines operation
+#define BR 0
+#define JMP 12
+     // RET is the same command, basically (see Page 529 of textbook)
+#define JSR 4
+#define LEA 14
+#define NOT 9
+#define TRAP 15
+
 
 typedef unsigned short Register;
 typedef unsigned char Byte;
@@ -79,14 +95,22 @@ int setIR (CPU_p, char*);
 int setSext(CPU_p);
 int setRegisters(CPU_p, char*, char*);
 int setRegister(CPU_p, unsigned int, int);
-Byte setZeroFlag (CPU_p);
-Register getIR (CPU_p);
+Byte setZeroFlag(CPU_p);
+Register getIR(CPU_p);
 Register getSext(CPU_p);
 Register getRegister(CPU_p, int);
 Register getImmed(CPU_p);
-Byte getOPCODE (CPU_p);
-Byte getRD (CPU_p);
-Byte getRS (CPU_p);
+Byte getOPCODE(CPU_p);
+Byte getRD(CPU_p);
+Byte getRS(CPU_p);
+Byte getSR1(CPU_p);
+Byte getSR2(CPU_p);
+Byte getImmed5(CPU_p);
+Byte getPCoffset9(CPU_p);
+Byte getOffset6(CPU_p);
+Byte getBaseR(CPU_p);
+Byte getTrapvect8(CPU_p);
+Byte getBit5(CPU_p);
 
 void displayRegisterBinary(Register);
 void displayByteBinary(Byte);

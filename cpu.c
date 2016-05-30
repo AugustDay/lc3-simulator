@@ -191,7 +191,7 @@ Byte getDR (CPU_p cpu) {
    IN: pointer to a CPU
    OUT: Byte Sr1, POINTER_ERROR returned if given CPU is null
 */
-Byte getSR1 (CPU_p cpu) {
+Byte getSR1(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & SR1_MASK;
 	temp = temp >> 6;
@@ -202,7 +202,7 @@ Byte getSR1 (CPU_p cpu) {
    IN: pointer to a CPU
    OUT: Byte Sr2, POINTER_ERROR returned if given CPU is null
 */
-Byte getSR2 (CPU_p cpu) {
+Byte getSR2(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & SR2_MASK;
 	return (Byte) temp;
@@ -212,7 +212,7 @@ Byte getSR2 (CPU_p cpu) {
    IN: pointer to a CPU
    OUT: Byte Immed5, POINTER_ERROR returned if given CPU is null
 */
-Byte getImmed5 (CPU_p cpu) {
+Byte getImmed5(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & IMMED5_MASK;
 	return (Byte) temp;
@@ -222,7 +222,7 @@ Byte getImmed5 (CPU_p cpu) {
    IN: pointer to a CPU
    OUT: Byte PCoffset9, POINTER_ERROR returned if given CPU is null
 */
-Byte getPCoffset9 (CPU_p cpu) {
+Byte getPCoffset9(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & PCOFFSET9_MASK;
 	return (Byte) temp;
@@ -232,7 +232,7 @@ Byte getPCoffset9 (CPU_p cpu) {
    IN: pointer to a CPU
    OUT: Byte offset6, POINTER_ERROR returned if given CPU is null
 */
-Byte getOffset6 (CPU_p cpu) {
+Byte getOffset6(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & OFFSET6_MASK;
 	return (Byte) temp;
@@ -242,7 +242,7 @@ Byte getOffset6 (CPU_p cpu) {
    IN: pointer to a CPU
    OUT: Byte BaseR, POINTER_ERROR returned if given CPU is null
 */
-Byte getBaseR (CPU_p cpu) {
+Byte getBaseR(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & BASER_MASK;
 	temp = temp >> 6;
@@ -253,9 +253,20 @@ Byte getBaseR (CPU_p cpu) {
    IN: pointer to a CPU
    OUT: Byte Trapvect8, POINTER_ERROR returned if given CPU is null
 */
-Byte getTrapvect8 (CPU_p cpu) {
+Byte getTrapvect8(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & TRAPVECT8_MASK;
+	return (Byte) temp;	
+}
+
+/* Gets bit[5] of the ir from the given CPU
+   IN: pointer to a CPU
+   OUT: 1 or 0, POINTER_ERROR returned if given CPU is null
+*/
+Byte getBit5(CPU_p cpu) {
+	if (cpu == NULL) return POINTER_ERROR;
+	Register temp = cpu->ir & BIT5_MASK;
+   temp = temp >> 5;
 	return (Byte) temp;	
 }
 
@@ -264,7 +275,7 @@ Byte getTrapvect8 (CPU_p cpu) {
    IN: pointer to a CPU, char input to set
    OUT: 1 if set operation is successful, -1 if POINTER_ERROR
  */
-int setIR (CPU_p cpu, char* input) {
+int setIR(CPU_p cpu, char* input) {
    if (cpu == NULL) return POINTER_ERROR;
    cpu->ir = strtol(input, NULL, 16);
    return 1;

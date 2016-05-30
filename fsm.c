@@ -310,12 +310,12 @@ int main (int argc, char *argv[]) {
    //PREPARE CPU 
    CPU_p cpu = constructCPU();
 	initCPU(cpu);
-   
+  
    if(controller(cpu) == 1) {
 		printf("Operations completed successfully.\n");	
 	} else {
 		printf("Something went wrong.\n");
-	}
+	} 
    
    return 0;
 }
