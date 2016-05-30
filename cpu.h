@@ -2,10 +2,10 @@
     cpu.h
 	
     Programer: George Mobus
-    Austin Ingraham
-	Date: 4/20/16
-	Description:
-		This header file contains the definitions for the CPU object.
+    Austin Ingraham, Arthur Panlilio
+	 Date: 4/20/16
+	 Description:
+	   This header file contains the definitions for the CPU object.
 */
 
 #ifndef _CPU_H_
@@ -17,38 +17,62 @@
 #define NO_OF_REGISTERS 8
 
 #define OPCODE_MASK 0xF000
-<<<<<<< HEAD
-
 #define DR_MASK 0x0E00
 #define SR1_MASK 0x01C0
 #define SR2_MASK 0x0003
 
 #define IMMED5_MASK 0x001F
-#define PCOFFSET9_MASK 0x01FF
 #define OFFSET6_MASK 0x003F
+#define OFFSET9_MASK 0x01FF
+#define OFFSET11_MASK 0x07FF
 #define BASER_MASK 0x01C0
 #define TRAPVECT8_MASK 0x00FF
+#define BIT5_MASK 0x0020
 
-=======
 #define RD_MASK 0x1C00
 #define RS_MASK 0x0380
 #define IMMED_MASK 0x007F
->>>>>>> refs/remotes/origin/master
 #define SIGN_MASK 0x0040  
 #define NEG_SIGN_EXTEND 0xFFC0 
 
-#define RD_MASK 0x1C00
-#define RS_MASK 0x0380 
-#define IMMED_MASK 0x007F
+/* Old OPCODES */
+//Temporarily appended 0's to avoid conflicts with new OPCODES
+#define LDI 30
+#define LD 40
+#define ST 50
+#define BNZ 60
+#define HALT 70
 
-#define HALT 7
-#define ADD 0
-#define ADI 1 
-#define NAND 2
-#define LDI 3
-#define LD 4
-#define ST 5
-#define BNZ 6
+/* New OPCODES, in order they appear on Page 119 of textbook */
+#define ADD 1
+     // ADD(I) <- flag bit (index 5) determines operation 
+#define AND 5
+     // AND(I) <- flag bit determines operation
+#define BR 0
+#define JMP 12
+     // RET is the same command, basically (see Page 529 of textbook)
+#define JSR 4
+#define LEA 14
+#define NOT 9
+#define TRAP 15
+
+/* Sign-Extension codes */
+#define IMMED5_SIGN 0
+#define IMMED5_SIGN_MASK 0x0010
+#define IMMED5_SIGN_EXTEND 0xFFF0
+
+#define OFFSET6_SIGN 1
+#define OFFSET6_SIGN_MASK 0x0020
+#define OFFSET6_SIGN_EXTEND 0xFFE0
+
+#define OFFSET9_SIGN 2
+#define OFFSET9_SIGN_MASK 0x0100
+#define OFFSET9_SIGN_EXTEND 0xFF00
+
+#define OFFSET11_SIGN 3
+#define OFFSET11_SIGN_MASK 0x0400
+#define OFFSET11_SIGN_EXTEND 0xFC00
+
 
 typedef unsigned short Register;
 typedef unsigned char Byte;
@@ -84,17 +108,24 @@ CPU_p constructCPU(void);
 int initCPU (CPU_p);
 
 int setIR (CPU_p, char*);
-int setSext(CPU_p);
-int setRegisters(CPU_p, char*, char*);
+int setSext(CPU_p, int);
 int setRegister(CPU_p, unsigned int, int);
-Byte setZeroFlag (CPU_p);
-Register getIR (CPU_p);
+Byte setZeroFlag(CPU_p);
+Register getIR(CPU_p);
 Register getSext(CPU_p);
 Register getRegister(CPU_p, int);
 Register getImmed(CPU_p);
-Byte getOPCODE (CPU_p);
-Byte getRD (CPU_p);
-Byte getRS (CPU_p);
+Byte getOPCODE(CPU_p);
+Byte getDR (CPU_p);
+Byte getSR1(CPU_p);
+Byte getSR2(CPU_p);
+Byte getImmed5(CPU_p);
+Byte getOffset6(CPU_p);
+Byte getOffset9(CPU_p);
+Byte getOffset11(CPU_p);
+Byte getBaseR(CPU_p);
+Byte getTrapvect8(CPU_p);
+Byte getBit5(CPU_p);
 
 void displayRegisterBinary(Register);
 void displayByteBinary(Byte);

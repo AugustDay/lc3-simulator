@@ -2,7 +2,7 @@
 	cpu.c
 	
 	Programmer: George Mobus
-   Austin Ingraham
+   Austin Ingraham, Arthur Panlilio
 	Date: 4/20/16
 	Descritption:
 		This file contains the implementation code for the CPU class.
@@ -154,28 +154,6 @@ Register getRegister(CPU_p cpu, int index) {
    return cpu->reg_file[index];
 }
 
-/* Gets Rd of a given CPU from the current ir
-   IN: pointer to a CPU
-   OUT: Byte Rd, POINTER_ERROR returned if given CPU is null
- */
-Byte getRD (CPU_p cpu) {
-	if (cpu == NULL) return POINTER_ERROR;
-	Register temp = cpu->ir & RD_MASK;
-	temp = temp >> 10;
-	return (Byte) temp;
-}
-
-/* Gets Rs of a given CPU from the current ir
-   IN: pointer to a CPU
-   OUT: Byte Rd, POINTER_ERROR returned if given CPU is null
- */
-Byte getRS (CPU_p cpu) {
-	if (cpu == NULL) return POINTER_ERROR;
-	Register temp = cpu->ir & RS_MASK;
-	temp = temp >> 7;
-	return (Byte) temp;
-}
-
 /* Gets DR of a given CPU from the current ir
    IN: pointer to a CPU
    OUT: Byte Dr, POINTER_ERROR returned if given CPU is null
@@ -191,7 +169,7 @@ Byte getDR (CPU_p cpu) {
    IN: pointer to a CPU
    OUT: Byte Sr1, POINTER_ERROR returned if given CPU is null
 */
-Byte getSR1 (CPU_p cpu) {
+Byte getSR1(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & SR1_MASK;
 	temp = temp >> 6;
@@ -202,7 +180,7 @@ Byte getSR1 (CPU_p cpu) {
    IN: pointer to a CPU
    OUT: Byte Sr2, POINTER_ERROR returned if given CPU is null
 */
-Byte getSR2 (CPU_p cpu) {
+Byte getSR2(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & SR2_MASK;
 	return (Byte) temp;
@@ -212,19 +190,9 @@ Byte getSR2 (CPU_p cpu) {
    IN: pointer to a CPU
    OUT: Byte Immed5, POINTER_ERROR returned if given CPU is null
 */
-Byte getImmed5 (CPU_p cpu) {
+Byte getImmed5(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & IMMED5_MASK;
-	return (Byte) temp;
-}
- 
-/* Gets PCoffset9 of a given CPU from the current ir
-   IN: pointer to a CPU
-   OUT: Byte PCoffset9, POINTER_ERROR returned if given CPU is null
-*/
-Byte getPCoffset9 (CPU_p cpu) {
-	if (cpu == NULL) return POINTER_ERROR;
-	Register temp = cpu->ir & PCOFFSET9_MASK;
 	return (Byte) temp;
 }
  
@@ -232,9 +200,29 @@ Byte getPCoffset9 (CPU_p cpu) {
    IN: pointer to a CPU
    OUT: Byte offset6, POINTER_ERROR returned if given CPU is null
 */
-Byte getOffset6 (CPU_p cpu) {
+Byte getOffset6(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & OFFSET6_MASK;
+	return (Byte) temp;
+}
+
+/* Gets PCoffset9 of a given CPU from the current ir
+   IN: pointer to a CPU
+   OUT: Byte PCoffset9, POINTER_ERROR returned if given CPU is null
+*/
+Byte getOffset9(CPU_p cpu) {
+	if (cpu == NULL) return POINTER_ERROR;
+	Register temp = cpu->ir & OFFSET9_MASK;
+	return (Byte) temp;
+}
+
+/* Gets PCoffset11 of a given CPU from the current ir
+   IN: pointer to a CPU
+   OUT: Byte PCoffset11, POINTER_ERROR returned if given CPU is null
+*/
+Byte getOffset11(CPU_p cpu) {
+	if (cpu == NULL) return POINTER_ERROR;
+	Register temp = cpu->ir & OFFSET11_MASK;
 	return (Byte) temp;
 }
 
@@ -242,7 +230,7 @@ Byte getOffset6 (CPU_p cpu) {
    IN: pointer to a CPU
    OUT: Byte BaseR, POINTER_ERROR returned if given CPU is null
 */
-Byte getBaseR (CPU_p cpu) {
+Byte getBaseR(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & BASER_MASK;
 	temp = temp >> 6;
@@ -253,9 +241,20 @@ Byte getBaseR (CPU_p cpu) {
    IN: pointer to a CPU
    OUT: Byte Trapvect8, POINTER_ERROR returned if given CPU is null
 */
-Byte getTrapvect8 (CPU_p cpu) {
+Byte getTrapvect8(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & TRAPVECT8_MASK;
+	return (Byte) temp;	
+}
+
+/* Gets bit[5] of the ir from the given CPU
+   IN: pointer to a CPU
+   OUT: 1 or 0, POINTER_ERROR returned if given CPU is null
+*/
+Byte getBit5(CPU_p cpu) {
+	if (cpu == NULL) return POINTER_ERROR;
+	Register temp = cpu->ir & BIT5_MASK;
+   temp = temp >> 5;
 	return (Byte) temp;	
 }
 
@@ -264,36 +263,55 @@ Byte getTrapvect8 (CPU_p cpu) {
    IN: pointer to a CPU, char input to set
    OUT: 1 if set operation is successful, -1 if POINTER_ERROR
  */
-int setIR (CPU_p cpu, char* input) {
+int setIR(CPU_p cpu, char* input) {
    if (cpu == NULL) return POINTER_ERROR;
    cpu->ir = strtol(input, NULL, 16);
    return 1;
 }
 
 /* Sets a given CPU's sign-extended (sext) Register
-   IN: pointer to a CPU
+   IN: pointer to a CPU, value code for what offset to set
    OUT: 1 if set operation is successful, -1 if POINTER_ERROR
  */
-int setSext(CPU_p cpu) {
+int setSext(CPU_p cpu, int signLocation) {
    if (cpu == NULL) return POINTER_ERROR;
-   Register immed = getImmed(cpu);
-   if (immed & SIGN_MASK) {
-      cpu->sext = immed | NEG_SIGN_EXTEND;
-   } else {
-      cpu->sext = immed;  
+   Register immed;
+   switch (signLocation) {
+      case IMMED5_SIGN:
+         immed = getImmed5(cpu);
+         if (immed & IMMED5_SIGN_MASK) {
+            cpu->sext = immed | IMMED5_SIGN_EXTEND;
+         } else {
+            cpu->sext = immed;  
+         }
+         break;
+      case OFFSET6_SIGN:
+         immed = getOffset6(cpu);
+         if (immed & OFFSET6_SIGN_MASK) {
+            cpu->sext = immed | OFFSET6_SIGN_EXTEND;
+         } else {
+            cpu->sext = immed;  
+         }
+         break;
+      case OFFSET9_SIGN:
+         immed = getOffset9(cpu);
+         if (immed & OFFSET9_SIGN_MASK) {
+            cpu->sext = immed | OFFSET9_SIGN_EXTEND;
+         } else {
+            cpu->sext = immed;  
+         }
+         break;
+      case OFFSET11_SIGN:
+         immed = getOffset11(cpu);
+         if (immed & OFFSET11_SIGN_MASK) {
+            cpu->sext = immed | OFFSET11_SIGN_EXTEND;
+         } else {
+            cpu->sext = immed;  
+         }
+         break;
    }
+   
 	return 1;
-}
-
-/* Sets a given CPU's Registers based on cpu->ir index
-   IN: pointer to a CPU, char input to set
-   OUT: 1 if set operation is successful, -1 if POINTER_ERROR
- */
-int setRegisters(CPU_p cpu, char* Rd_input, char* Rs_input) {
-   if (cpu == NULL) return POINTER_ERROR;
-   cpu->reg_file[getRD(cpu)] = strtol(Rd_input, NULL, 16);
-   cpu->reg_file[getRS(cpu)] = strtol(Rs_input, NULL, 16);
-   return 1; 
 }
 
 /* Sets a given CPU's Register at given index
@@ -333,24 +351,3 @@ void displayByteBinary(Byte theB) {
     }
    printf("\n");
 }
-
-/* Driver for CPU 
-int main (int argc, char *argv[]) {
-	if (argc < 5) {
-		printf ("Invalid input to program\n");
-		exit (0);
-	}
-   
-   //PREPARE CPU
-   CPU_p cpu = constructCPU();
-	initCPU(cpu);
-   setIR(cpu, argv[2]);
-   
-   displayRegisterBinary(cpu->ir);
-   
-   //PERFORM OPERATIONS
-   setRegisters(cpu, argv[3], argv[4]);
-   operate(cpu);
-   return 0;
-} */
-
