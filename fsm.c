@@ -177,12 +177,14 @@ int controller (CPU_p cpu) {
                    case ADD: break;
                    case LDI: break;
                    case LD:
-                     /* cpu->mar = getRegister(cpu, rs) + getSext(cpu);
-                      printf("mar = %d", cpu->mar); */
+					  setSext(cpu, OFFSET9_SIGN);
+                      cpu->mar = cpu->pc + getSext(cpu);
+                      printf("mar = %d", cpu->mar); 
                       break;
                    case ST:
-                     /* cpu->mar = getRegister(cpu, rd) + getSext(cpu);
-                      printf("mar = %d", cpu->mar); */
+					  setSext(cpu, OFFSET9_SIGN);
+                      cpu->mar = cpu->pc + getSext(cpu);
+                      printf("mar = %d", cpu->mar); 
                       break;
                    case BNZ:
                      /* branchAddress = cpu->pc + getSext(cpu);
@@ -223,16 +225,19 @@ int controller (CPU_p cpu) {
 						printf("ALU_A = %d, ALU_B = %d", getALU_A(cpu->alu), getALU_B(cpu->alu)); 
 						break;
                    case LD: 
-                     /* printf("mdr = memory[%d] = 0x%.4X", cpu->mdr, memory[cpu->mdr]);
-                      cpu->mdr = memory[cpu->mdr]; */                      
-                      break;
+						cpu->mdr = memory[cpu->mdr];  
+						printf("mdr = memory[%d] = 0x%.4X", cpu->mdr, memory[cpu->mdr]);                    
+						break;
                    case LDI: 
                      /* cpu->mdr = getSext(cpu);
                       printf("mdr = 0x%.4X", cpu->mdr); */
                       break;
+				   case NOT:
+						cpu->alu->a = getRegister(cpu, sr1); // get first operand
+						printf("ALU_A = %d", getALU_A(cpu->alu));
                    case ST: 
-                     /* cpu->mdr = getRegister(cpu, rs);
-                      printf("mdr = 0x%.4X", cpu->mdr); */
+                      cpu->mdr = getRegister(cpu, sr1);
+                      printf("mdr = 0x%.4X", cpu->mdr); 
                       break;
                    case BNZ: break;
                    case HALT: break;
@@ -262,12 +267,15 @@ int controller (CPU_p cpu) {
 						break;
                    case LDI: break;
                    case LD: 
-                     /* cpu->mdr = memory[cpu->mar];
-                      printf("mdr = 0x%.4X", cpu->mdr); */
-                      break;
+						cpu->mdr = memory[cpu->mar];
+                      printf("mdr = 0x%.4X", cpu->mdr); 
+						break;
+				   case NOT:
+						cpu->alu->r = ~(getALU_A(cpu->alu));
+						break;
                    case ST:
-                     /* memory[cpu->mar] = cpu->mdr;
-                      printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); */
+                      memory[cpu->mar] = cpu->mdr;
+                      printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); 
                       break;
                    case BNZ:                     
                      /* if (cpu->zero) {                         
@@ -297,9 +305,12 @@ int controller (CPU_p cpu) {
 					  break;
                    case LDI:
                    case LD:
-                    /*  cpu->reg_file[rd] = cpu->mdr;
-                      printf("reg_file[%d] = 0x%.4X", rd, cpu->mdr); */
+                      cpu->reg_file[dr] = cpu->mdr;
+                      printf("reg_file[%d] = 0x%.4X", dr, cpu->mdr);
                       break;
+				   case NOT:
+					  setRegister(cpu, getALU_R(cpu->alu), dr);
+					  printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu)); 
                    case ST: break;
                    case BNZ: break;
                    case HALT: break;
