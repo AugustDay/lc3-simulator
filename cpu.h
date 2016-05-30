@@ -38,8 +38,6 @@
 /* Old OPCODES */
 //Temporarily appended 0's to avoid conflicts with new OPCODES
 #define LDI 30
-#define LD 40
-#define ST 50
 #define BNZ 60
 #define HALT 70
 
@@ -53,6 +51,11 @@
      // RET is the same command, basically (see Page 529 of textbook)
 #define JSR 4
 #define LEA 14
+#define LD 4
+#define LDR 6
+#define ST 3
+#define STR 7
+#define STI 11
 #define NOT 9
 #define TRAP 15
 
