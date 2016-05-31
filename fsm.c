@@ -248,7 +248,6 @@ int controller (CPU_p cpu) {
                       printf("mdr = memory[%d] = 0x%.4X", cpu->mdr, memory[cpu->mdr]);      
                       break;
                    case LDI: 
-<<<<<<< HEAD
 						cpu->mdr = memory[cpu->mdr]; //not sure if this is where it goes.
 						cpu->mdr = memory[cpu->mar];
 						cpu->mar = cpu->mdr;
@@ -268,14 +267,6 @@ int controller (CPU_p cpu) {
 						cpu->mdr = getRegister(cpu, dr);
 						printf("mdr = 0x%.4X", cpu->mdr); 
 						break;
-=======
-                      /* cpu->mdr = getSext(cpu);
-                      printf("mdr = 0x%.4X", cpu->mdr); */
-                      break;
-                   case NOT:
-                      cpu->alu->a = getRegister(cpu, sr1); // get first operand
-                      printf("ALU_A = %d", getALU_A(cpu->alu));
->>>>>>> origin/master
                    case ST: 
 						cpu->mdr = getRegister(cpu, dr); //dr is the register value to put into memory
 						printf("mdr = 0x%.4X", cpu->mdr); 
