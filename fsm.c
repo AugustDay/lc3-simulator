@@ -218,36 +218,37 @@ int controller (CPU_p cpu) {
 				   printf("\nFETCH_OP: ");
 				   switch (opcode) {
                    case ADD:
-                        bit5 = getBit5(cpu);
-                        if(bit5) { //ADD(I)
-                           setSext(cpu, IMMED5_SIGN);
-                           cpu->alu->a = getRegister(cpu, sr1);	// get first operand
-                           cpu->alu->b = getSext(cpu); // get second operand 
-                        } else { //Standard Add
-                           sr2 = getSR2(cpu);
-                           cpu->alu->a = getRegister(cpu, sr1);	// get first operand
-                           cpu->alu->b = getRegister(cpu, sr2);	// get second operand
-                        }                      
+                      bit5 = getBit5(cpu);
+                      if(bit5) { //ADD(I)
+                         setSext(cpu, IMMED5_SIGN);
+                         cpu->alu->a = getRegister(cpu, sr1);	// get first operand
+                         cpu->alu->b = getSext(cpu); // get second operand 
+                      } else { //Standard Add
+                         sr2 = getSR2(cpu);
+                         cpu->alu->a = getRegister(cpu, sr1);	// get first operand
+                         cpu->alu->b = getRegister(cpu, sr2);	// get second operand
+                      }                      
                       printf("ALU_A = %d, ALU_B = %d", getALU_A(cpu->alu), getALU_B(cpu->alu)); 
                       break; 
-				   case AND:
-						bit5 = getBit5(cpu);
-						if(bit5) { //AND(I)
-							setSext(cpu, IMMED5_SIGN);
-							cpu->alu->a = getRegister(cpu, sr1); // get first operand
-							cpu->alu->b = getSext(cpu); // get second operand
-						} else { //Standard Add
-							sr2 = getSR2(cpu);
-							cpu->alu->a = getRegister(cpu, sr1); // get first operand
-							cpu->alu->b = getRegister(cpu, sr2); // get second operand
-						}
-						printf("ALU_A = %d, ALU_B = %d", getALU_A(cpu->alu), getALU_B(cpu->alu)); 
-						break;
+                   case AND:
+                      bit5 = getBit5(cpu);
+                      if(bit5) { //AND(I)
+                         setSext(cpu, IMMED5_SIGN);
+                         cpu->alu->a = getRegister(cpu, sr1); // get first operand
+                         cpu->alu->b = getSext(cpu); // get second operand
+                      } else { //Standard Add
+                         sr2 = getSR2(cpu);
+                         cpu->alu->a = getRegister(cpu, sr1); // get first operand
+                         cpu->alu->b = getRegister(cpu, sr2); // get second operand
+                      }
+                      printf("ALU_A = %d, ALU_B = %d", getALU_A(cpu->alu), getALU_B(cpu->alu)); 
+                      break;
                    case LD: 
-						cpu->mdr = memory[cpu->mdr];  
-						printf("mdr = memory[%d] = 0x%.4X", cpu->mdr, memory[cpu->mdr]);                    
-						break;
+                      cpu->mdr = memory[cpu->mdr];  
+                      printf("mdr = memory[%d] = 0x%.4X", cpu->mdr, memory[cpu->mdr]);      
+                      break;
                    case LDI: 
+<<<<<<< HEAD
 						cpu->mdr = memory[cpu->mdr]; //not sure if this is where it goes.
 						cpu->mdr = memory[cpu->mar];
 						cpu->mar = cpu->mdr;
@@ -267,6 +268,14 @@ int controller (CPU_p cpu) {
 						cpu->mdr = getRegister(cpu, dr);
 						printf("mdr = 0x%.4X", cpu->mdr); 
 						break;
+=======
+                      /* cpu->mdr = getSext(cpu);
+                      printf("mdr = 0x%.4X", cpu->mdr); */
+                      break;
+                   case NOT:
+                      cpu->alu->a = getRegister(cpu, sr1); // get first operand
+                      printf("ALU_A = %d", getALU_A(cpu->alu));
+>>>>>>> origin/master
                    case ST: 
 						cpu->mdr = getRegister(cpu, dr); //dr is the register value to put into memory
 						printf("mdr = 0x%.4X", cpu->mdr); 
@@ -294,7 +303,7 @@ int controller (CPU_p cpu) {
 							 break;
 					case AND:
 						if(bit5) {
-							printf("AND(I) 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));						
+							printf("AND(I) 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));	
 						} else {
 							printf("ADD 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
 						}
