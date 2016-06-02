@@ -76,6 +76,10 @@
 #define OFFSET11_SIGN_MASK 0x0400
 #define OFFSET11_SIGN_EXTEND 0xFC00
 
+#define TRAPVECTOR_SIGN 4
+#define TRAPVECTOR_SIGN_MASK 0x00FF
+#define TRAPVECTOR_SIGN_EXTEND 0xFE00
+
 
 typedef unsigned short Register;
 typedef unsigned char Byte;

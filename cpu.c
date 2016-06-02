@@ -309,6 +309,13 @@ int setSext(CPU_p cpu, int signLocation) {
             cpu->sext = immed;  
          }
          break;
+	  case TRAPVECTOR_SIGN:
+		 immed = getTrapvect8(cpu);
+		 if (immed & TRAPVECTOR_SIGN_MASK) {
+			cpu->sext = immed | TRAPVECTOR_SIGN_EXTEND;
+	     } else {
+			cpu->sext = immed;
+		 }
    }
    
 	return 1;
