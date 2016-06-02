@@ -15,6 +15,7 @@
 
 #define POINTER_ERROR -1
 #define INDEX_OUT_OF_BOUNDS -1
+#define FILE_ERROR -1
 
 #define NO_OF_REGISTERS 8
 

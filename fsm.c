@@ -49,7 +49,7 @@ FILE* openFile(char filename[]) {
     FILE* file = fopen(filename, "r");
 
     if (!file) {
-        printf("\tCould not open filename \"%s\"\n", filename);
+        printf("\tCould not open filename \"%s\"\n\n", filename);
         return getInputFile();
     } else {
         return file;
@@ -84,6 +84,20 @@ int loadData() {
    return 1;  
 }
 
+int saveData(int m) {
+	FILE* outFile = fopen("output.hex", "w");
+	int i = 0;
+	if (!outFile) {
+    	printf("\tERROR OPENING FILE\n");
+		return FILE_ERROR;
+    }
+    for(i; i <= m; i++) {
+	   fprintf(outFile, "%.4X\n", memory[i]); 		   
+    }
+	fclose(outFile);
+	return 1;
+}
+
 int debug(CPU_p cpu) {
    int m = 0, input = 8, repeat = 1;;
    unsigned short reg = 0;
@@ -101,6 +115,18 @@ int debug(CPU_p cpu) {
             loadData();   
             displayMemory(cpu, m);
             break;
+		 case 2:
+			printf("\tChoose terminating index of memory to output, (0 - %d)\n\t> ", (MEMORY_SIZE - 1));
+			scanf(" %d", &m);
+            if(m < 0) {
+               m = 0;
+            } else if (m > (MEMORY_SIZE - 1)) {
+               m = MEMORY_SIZE - 1;   
+            }
+			printf("\tSaving memory into output.hex ... ");
+			saveData(m);
+			printf("done.\n");
+			break;
          case 4: //STEP
             input = 0;
             break;
