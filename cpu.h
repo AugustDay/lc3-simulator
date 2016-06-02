@@ -38,10 +38,10 @@
 #define NEG_SIGN_EXTEND 0xFFC0 
 
 /* Old OPCODES */
-//Temporarily appended 0's to avoid conflicts with new OPCODES
-#define LDI 30
+
+// #define LDI 30
 #define BNZ 60
-#define HALT 70
+// #define HALT 70
 
 /* New OPCODES, in order they appear on Page 119 of textbook */
 #define ADD 1
@@ -55,6 +55,7 @@
 #define LEA 14
 #define LD 4
 #define LDR 6
+#define LDI 10
 #define ST 3
 #define STR 7
 #define STI 11
@@ -79,8 +80,13 @@
 #define OFFSET11_SIGN_EXTEND 0xFC00
 
 #define TRAPVECTOR_SIGN 4
-#define TRAPVECTOR_SIGN_MASK 0x00FF
-#define TRAPVECTOR_SIGN_EXTEND 0xFE00
+#define TRAPVECTOR_SIGN_MASK 0x0080
+#define TRAPVECTOR_SIGN_EXTEND 0xFFC0
+
+#define GETC 32
+#define OUT	 33
+#define PUTS 34
+#define HALT 37
 
 
 typedef unsigned short Register;

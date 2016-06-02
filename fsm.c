@@ -239,6 +239,8 @@ int controller (CPU_p cpu) {
                      /* branchAddress = cpu->pc + getSext(cpu);
                       printf("branchAddress = %d", branchAddress); */
                       break;
+				   case TRAP:
+					  printf("TRAP");
                    case HALT: break;
                 }
               
@@ -364,6 +366,25 @@ int controller (CPU_p cpu) {
                          printf("Branch not taken.");  
                       } */
                       break;
+				   case TRAP:				 
+					 setSext(cpu, TRAPVECTOR_SIGN);
+					 int trapVector = cpu->sext;
+					 switch (trapVector) {
+						 case GETC:
+							printf("GETC");
+							break;
+						 case OUT:
+							printf("OUT");
+							break;
+						 case PUTS:
+							printf("PUTS");
+							break;
+						 case HALT:
+							printf("HALT");
+							break;
+						 break;
+					 }
+					 break;
                    case HALT: 
                       printf("HALT");
                       break;
@@ -378,7 +399,7 @@ int controller (CPU_p cpu) {
                       setRegister(cpu, getALU_R(cpu->alu), dr); 
                       printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu)); 
                       break;
-				       case AND:
+				   case AND:
                       setRegister(cpu, getALU_R(cpu->alu), dr);
                       printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu));
                       break;
