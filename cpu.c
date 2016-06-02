@@ -338,6 +338,21 @@ Byte setZeroFlag (CPU_p cpu) {
 	return cpu->zero;
 }
 
+int resetCPU(CPU_p cpu) {
+   if (cpu == NULL) return POINTER_ERROR;
+   cpu->pc = 0;
+   cpu->sw = 0;
+   cpu->ir = 0;
+   cpu->mar = 0;
+   cpu->mdr = 0;
+   cpu->sext = 0;
+   cpu->zero = 0;
+   cpu->alu->a = 0;
+   cpu->alu->b = 0;
+   cpu->alu->r = 0;
+   return 1;
+}
+
 /* Prints the binary representation of this register (unsigned short). */
 void displayRegisterBinary(Register theR) {
     int i;

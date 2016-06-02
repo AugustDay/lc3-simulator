@@ -20,9 +20,11 @@
 #define FETCH_OP 3
 #define EXECUTE 4
 #define STORE 5
-#define MEMORY_SIZE 32
+#define MEMORY_SIZE 3000
 
 unsigned short memory[MEMORY_SIZE]; 
+
+
 
 void purgeBuffer() {
    char c; 
@@ -43,20 +45,66 @@ void displayMemory(CPU_p cpu, int m) {
    printf("\nPC: %.4X   SW: %.4X   IR: %.4X\n", cpu->pc, 0, getIR(cpu));
 }
 
+FILE* openFile(char filename[]) {
+    FILE* file = fopen(filename, "r");
+
+    if (!file) {
+        printf("\tCould not open filename \"%s\"\n", filename);
+        return getInputFile();
+    } else {
+        return file;
+    }
+}
+
+FILE* getInputFile() {
+    int i = 0, size = 50; //max allowed filename
+    char ch, filename[size];  
+
+    printf("\tEnter the name of the file to load:\n\t> ");
+    scanf("%c", &ch);
+    while (ch != '\n' && i < size - 1) { //builds string from chars entered
+        filename[i] = ch;
+        ch = getchar();
+        i++;
+    }    
+    filename[i] = '\0';
+    return openFile(filename);
+}
+
+int loadData() {
+   int i = 0;
+   char line[10];
+   FILE* file = getInputFile();
+   printf("\tFound the file, loading data... ");
+   while (fgets(line, sizeof(line), file) && i < MEMORY_SIZE) {
+      memory[i] = strtol(line, NULL, 16);
+      i++;
+   }
+   printf("done.\n");
+   return 1;  
+}
+
 int debug(CPU_p cpu) {
-   int m = 0, input = 7, repeat = 1;;
+   int m = 0, input = 8, repeat = 1;;
    unsigned short reg = 0;
    char* memoryLoc = malloc(sizeof(char) * 20);
    displayMemory(cpu, m);
    while(input > 0) {      
-      printf("\n1 Load, 2 Save, 3 Run, 4 Step, 5 Memory Dump, 6 Memory Edit\n> ");
+      if (m > (MEMORY_SIZE - 16)) {
+         m = MEMORY_SIZE - 16;   
+      }
+      printf("\n1 Load, 2 Save, 3 Run, 4 Step, 5 Memory Dump, 6 Memory Edit, 7 Reset\n> ");
       scanf(" %d", &input);
       purgeBuffer();
       switch(input) {
-         case 4:
+         case 1: //LOAD OBJECT FILE
+            loadData();   
+            displayMemory(cpu, m);
+            break;
+         case 4: //STEP
             input = 0;
             break;
-         case 5: 
+         case 5: //MEMORY DUMP
             printf("\tChoose memory dump starting index, (0 - %d)\n\t> ", (MEMORY_SIZE - 16));
             scanf(" %d", &m);
             if(m < 0) {
@@ -67,14 +115,15 @@ int debug(CPU_p cpu) {
             displayMemory(cpu, m);
 
             break;
-         case 6:
+         case 6: //MEMORY EDIT
             repeat = 1;
             while(repeat) {
                printf("\tEnter memory location to edit,\n\t> ");
                scanf(" %s", memoryLoc);
                m = strtol(memoryLoc, NULL, 0);
                if(m < 0 || m >= MEMORY_SIZE) {
-                  printf("\tIndex out of range, please enter value between 0 and %d.\n", (MEMORY_SIZE - 1));
+                  printf("\tIndex out of range, please enter value between 0 and %d.\n",
+                         (MEMORY_SIZE - 1));
                } else {
                   printf("\t%d/%.4X location chosen. Please enter new value:\n\t> ", m, m);
                   scanf(" %s", memoryLoc);
@@ -84,10 +133,23 @@ int debug(CPU_p cpu) {
                   if(memoryLoc[0] == 'y' || memoryLoc[0] == 'Y') {} else { repeat = 0;}
                }
             }
+            
+            break;
+         case 7: //RESET
+            printf("\tResetting simulator, y to confirm,\n\t> ");
+            scanf(" %s", memoryLoc);
+            if(memoryLoc[0] == 'y' || memoryLoc[0] == 'Y') {
+               printf("\tResetting... ");
+               initMemory();
+               initRegisters(cpu);
+               resetCPU(cpu);
+               printf("done.\n");
+               displayMemory(cpu, m);
+            } 
             break;
          default:
-            printf("\tInvalid choice, please enter value 1-6\n");
-            input = 7;
+            printf("\tInvalid choice, please enter value 1-7\n");
+            input = 8;
             break;
       }
       
@@ -96,49 +158,17 @@ int debug(CPU_p cpu) {
 }
 
 void initRegisters(CPU_p cpu) {
-	cpu->reg_file[0] = 0;	
-	cpu->reg_file[1] = 0;
-	cpu->reg_file[2] = 0;
-	cpu->reg_file[3] = 0;
-	cpu->reg_file[4] = 0;
-	cpu->reg_file[5] = 0;
-	cpu->reg_file[6] = 0;
-	cpu->reg_file[7] = 0;
+   int i = 0;
+   for(i; i < NO_OF_REGISTERS; i++) {
+	   cpu->reg_file[i] = 0;	
+   }
 }
 
 void initMemory() {
-	memory[0] = 0x6812; //LDI R2, 0x12
-	memory[1] = 0x8D00; //LD R3, R2, 0 
-	memory[2] = 0x2901; //ADI R2, R2, 1
-	memory[3] = 0x9100; //LD R4, R2, 0
-	memory[4] = 0x0E00; //ADD R3, R4
-	memory[5] = 0xC002; //BRZ OUT
-	memory[6] = 0x2901; //ADI R2, R2, 1
-	memory[7] = 0xA980; //ST R2, R3, 0
-	memory[8] = 0xE000; //OUT: HALT
-	memory[9] = 0xE000;
-	memory[10] = 0xE000;
-	memory[11] = 0xE000;
-	memory[12] = 0xE000;
-	memory[13] = 0xE000;
-	memory[14] = 0xE000;
-	memory[15] = 0xE000;
-	memory[16] = 0xE000;
-	memory[17] = 0xE000;
-	memory[18] = 0x0002; //OPND1
-	memory[19] = 0xFFFE; //OPND2
-	memory[20] = 0xE000; //result
-	memory[21] = 0xE000;
-	memory[22] = 0xE000; 
-	memory[23] = 0xE000;
-	memory[24] = 0xE000;
-	memory[25] = 0xE000;
-	memory[26] = 0xE000;
-	memory[27] = 0xE000;
-	memory[28] = 0xE000;
-	memory[29] = 0xE000;
-	memory[30] = 0xE000;
-	memory[31] = 0xE000;
+   int i = 0;
+   for(i; i < MEMORY_SIZE; i++) {
+	   memory[i] = 0x0000;	
+   }
 }
 
 int controller (CPU_p cpu) {
@@ -176,35 +206,35 @@ int controller (CPU_p cpu) {
                 switch (opcode) {
                    case ADD: break;
                    case LDI:
-					  setSext(cpu, OFFSET9_SIGN);
-					  cpu->mar = cpu->pc + getSext(cpu);
-					  printf("mar = %d", cpu->mar);
-				      break;
+                      setSext(cpu, OFFSET9_SIGN);
+                      cpu->mar = cpu->pc + getSext(cpu);
+                      printf("mar = %d", cpu->mar);
+				          break;
                    case LD:
-					  setSext(cpu, OFFSET9_SIGN);
+                      setSext(cpu, OFFSET9_SIGN);
                       cpu->mar = cpu->pc + getSext(cpu);
                       printf("mar = %d", cpu->mar); 
                       break;
-				   case LDR:
-					  setSext(cpu, OFFSET6_SIGN);
-					  cpu->mar = sr1 + getSext(cpu); //adds the base register with offset6
-					  printf("mar = %d", cpu->mar);
-					  break;
-				   case STI:
-					  setSext(cpu, OFFSET9_SIGN);
-					  cpu->mar = cpu->pc + getSext(cpu);
-					  printf("mar = %d", cpu->mar);
-					  break;
+                   case LDR:
+                      setSext(cpu, OFFSET6_SIGN);
+                      cpu->mar = sr1 + getSext(cpu); //adds the base register with offset6
+                      printf("mar = %d", cpu->mar);
+                      break;
+                   case STI:
+                      setSext(cpu, OFFSET9_SIGN);
+                      cpu->mar = cpu->pc + getSext(cpu);
+                      printf("mar = %d", cpu->mar);
+                      break;
                    case ST:
-					  setSext(cpu, OFFSET9_SIGN);
+                      setSext(cpu, OFFSET9_SIGN);
                       cpu->mar = cpu->pc + getSext(cpu);
                       printf("mar = %d", cpu->mar); 
                       break;
-				   case STR:
-					  setSext(cpu, OFFSET6_SIGN);
-					  cpu->mar = sr1 + getSext(cpu); //adds the base register with offset6
-					  printf("mar = %d", cpu->mar);
-					  break;
+                   case STR:
+                      setSext(cpu, OFFSET6_SIGN);
+                      cpu->mar = sr1 + getSext(cpu); //adds the base register with offset6
+                      printf("mar = %d", cpu->mar);
+                      break;
                    case BNZ:
                      /* branchAddress = cpu->pc + getSext(cpu);
                       printf("branchAddress = %d", branchAddress); */
@@ -248,33 +278,33 @@ int controller (CPU_p cpu) {
                       printf("mdr = memory[%d] = 0x%.4X", cpu->mdr, memory[cpu->mdr]);      
                       break;
                    case LDI: 
-						cpu->mdr = memory[cpu->mdr]; //not sure if this is where it goes.
-						cpu->mdr = memory[cpu->mar];
-						cpu->mar = cpu->mdr;
-						printf("mdr = 0x%.4X", cpu->mdr); 
-						break;
-				   case LDR:
-						cpu->mdr = memory[cpu->mdr];
-						printf("mdr = memory[%d] = 0x%.4X", cpu->mdr, memory[cpu->mdr]); 
-						break;
-				   case NOT:
-						cpu->alu->a = getRegister(cpu, sr1); // get first operand
-						printf("ALU_A = %d", getALU_A(cpu->alu));
-						break;
-				   case STI:
-						cpu->mdr = memory[cpu->mar]; //not sure if this is where it goes.
-						cpu->mar = cpu->mdr;
-						cpu->mdr = getRegister(cpu, dr);
-						printf("mdr = 0x%.4X", cpu->mdr); 
-						break;
+                     cpu->mdr = memory[cpu->mdr]; //not sure if this is where it goes.
+                     cpu->mdr = memory[cpu->mar];
+                     cpu->mar = cpu->mdr;
+                     printf("mdr = 0x%.4X", cpu->mdr); 
+                     break;
+                   case LDR:
+                     cpu->mdr = memory[cpu->mdr];
+                     printf("mdr = memory[%d] = 0x%.4X", cpu->mdr, memory[cpu->mdr]); 
+                     break;
+                   case NOT:
+                     cpu->alu->a = getRegister(cpu, sr1); // get first operand
+                     printf("ALU_A = %d", getALU_A(cpu->alu));
+                     break;
+                   case STI:
+                     cpu->mdr = memory[cpu->mar]; //not sure if this is where it goes.
+                     cpu->mar = cpu->mdr;
+                     cpu->mdr = getRegister(cpu, dr);
+                     printf("mdr = 0x%.4X", cpu->mdr); 
+                     break;
                    case ST: 
-						cpu->mdr = getRegister(cpu, dr); //dr is the register value to put into memory
-						printf("mdr = 0x%.4X", cpu->mdr); 
-						break;
-				   case STR:
-						cpu->mdr = getRegister(cpu, dr);
-						printf("mdr = 0x%.4X", cpu->mdr); 
-						break;
+                     cpu->mdr = getRegister(cpu, dr); //dr is the register value to put into memory
+                     printf("mdr = 0x%.4X", cpu->mdr); 
+                     break;
+                   case STR:
+                     cpu->mdr = getRegister(cpu, dr);
+                     printf("mdr = 0x%.4X", cpu->mdr); 
+                     break;
                    case BNZ: break;
                    case HALT: break;
                 }
@@ -284,7 +314,7 @@ int controller (CPU_p cpu) {
             case EXECUTE:
 				    printf("\nEXECUTE: ");
                 switch (opcode) {
-						 case ADD: 
+                   case ADD: 
                       if(bit5) {
                          printf("ADD(I) 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
                       } else {
@@ -292,40 +322,40 @@ int controller (CPU_p cpu) {
                       }
 						    alu_ADD(cpu);
 							 break;
-					case AND:
-						if(bit5) {
-							printf("AND(I) 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));	
-						} else {
-							printf("ADD 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
-						}
-						cpu->alu->r = (getALU_A(cpu->alu) & getALU_B(cpu->alu)); // ANDS the two registers.
-						setZeroFlag(cpu);
-						break;
+                   case AND:
+                     if(bit5) {
+                        printf("AND(I) 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));	
+                     } else {
+                        printf("ADD 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
+                     }
+                     cpu->alu->r = (getALU_A(cpu->alu) & getALU_B(cpu->alu)); // ANDS the two registers.
+                     setZeroFlag(cpu);
+                     break;
                    case LDI: 
-						cpu->mdr = memory[cpu->mar];
-						break;
+                     cpu->mdr = memory[cpu->mar];
+                     break;
                    case LD: 
-						cpu->mdr = memory[cpu->mar];
-						printf("mdr = 0x%.4X", cpu->mdr);
-						break;
-				   case LDR:
-						cpu->mdr = memory[cpu->mar];
-						printf("mdr = 0x%.4X", cpu->mdr); 
-				   case NOT:
-						cpu->alu->r = ~(getALU_A(cpu->alu));
-						break;
-				   case STI:
-						memory[cpu->mar] = cpu->mdr;
-						printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); 
-						break;
+                     cpu->mdr = memory[cpu->mar];
+                     printf("mdr = 0x%.4X", cpu->mdr);
+                     break;
+                   case LDR:
+                     cpu->mdr = memory[cpu->mar];
+                     printf("mdr = 0x%.4X", cpu->mdr); 
+                   case NOT:
+                     cpu->alu->r = ~(getALU_A(cpu->alu));
+                     break;
+                   case STI:
+                     memory[cpu->mar] = cpu->mdr;
+                     printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); 
+                     break;
                    case ST:
-						memory[cpu->mar] = cpu->mdr;
-						printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); 
-						break;
-				   case STR:
-						memory[cpu->mar] = cpu->mdr;
-						printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); 
-						break;
+                     memory[cpu->mar] = cpu->mdr;
+                     printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); 
+                     break;
+                   case STR:
+                     memory[cpu->mar] = cpu->mdr;
+                     printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); 
+                     break;
                    case BNZ:                     
                      /* if (cpu->zero) {                         
                          cpu->pc = branchAddress;
@@ -348,25 +378,26 @@ int controller (CPU_p cpu) {
                       setRegister(cpu, getALU_R(cpu->alu), dr); 
                       printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu)); 
                       break;
-				   case AND:
-					  setRegister(cpu, getALU_R(cpu->alu), dr);
-					  printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu));
-					  break;
+				       case AND:
+                      setRegister(cpu, getALU_R(cpu->alu), dr);
+                      printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu));
+                      break;
                    case LDI:
-					  cpu->reg_file[dr] = cpu->mdr;
-					  printf("reg_file[%d] = 0x%.4X", dr, cpu->mdr);
+                      cpu->reg_file[dr] = cpu->mdr;
+                      printf("reg_file[%d] = 0x%.4X", dr, cpu->mdr);
                       break;
                    case LD:
                       cpu->reg_file[dr] = cpu->mdr;
                       printf("reg_file[%d] = 0x%.4X", dr, cpu->mdr);
                       break;
-				   case LDR:
-					  cpu->reg_file[dr] = cpu->mdr;
-					  printf("reg_file[%d] = 0x%.4X", dr, cpu->mdr);
+				       case LDR:
+					       cpu->reg_file[dr] = cpu->mdr;
+					       printf("reg_file[%d] = 0x%.4X", dr, cpu->mdr);
                       break;
-				   case NOT:
-					  setRegister(cpu, getALU_R(cpu->alu), dr);
-					  printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu)); 
+				       case NOT:
+					       setRegister(cpu, getALU_R(cpu->alu), dr);
+					       printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu)); 
+                      break;
                    case ST: break;
                    case BNZ: break;
                    case HALT: break;

@@ -8,6 +8,8 @@
 	   This header file contains the definitions for the CPU object.
 */
 
+#include <stdio.h>
+
 #ifndef _CPU_H_
 #define _CPU_H_
 
@@ -101,7 +103,8 @@ typedef struct cpu_s {
 
 typedef CPU_s * CPU_p;
 
-// prototypes
+//PROTOTYPES
+//ALU
 ALU_p constructALU(void);
 ALU_p getALU(CPU_p);
 Register getALU_A(ALU_p);
@@ -111,9 +114,10 @@ Register alu_ADD(CPU_p);
 Register alu_ADI(CPU_p);
 Register alu_NAND(CPU_p);
 
+//CPU
 CPU_p constructCPU(void);
 int initCPU (CPU_p);
-
+int resetCPU(CPU_p);
 int setIR (CPU_p, char*);
 int setSext(CPU_p, int);
 int setRegister(CPU_p, unsigned int, int);
@@ -134,7 +138,18 @@ Byte getBaseR(CPU_p);
 Byte getTrapvect8(CPU_p);
 Byte getBit5(CPU_p);
 
+//Utility functions
 void displayRegisterBinary(Register);
 void displayByteBinary(Byte);
+void purgeBuffer();
+
+//Debug and simulator initialization
+int debug(CPU_p);
+void displayMemory(CPU_p, int);
+void initRegisters(CPU_p);
+void initMemory();
+FILE* openFile(char[]);
+FILE* getInputFile();
+//int loadData(FILE*);
 
 #endif
