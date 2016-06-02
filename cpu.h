@@ -83,6 +83,9 @@
 #define TRAPVECTOR_SIGN_MASK 0x0080
 #define TRAPVECTOR_SIGN_EXTEND 0xFFC0
 
+#define KBSR_MASK 0x8000
+#define KBDR_MASK 0x00FF
+
 #define GETC 32
 #define OUT	 33
 #define PUTS 34
@@ -143,6 +146,7 @@ Byte getOffset11(CPU_p);
 Byte getBaseR(CPU_p);
 Byte getTrapvect8(CPU_p);
 Byte getBit5(CPU_p);
+void trapGetc(CPU_p);
 
 //Utility functions
 void displayRegisterBinary(Register);

@@ -321,6 +321,19 @@ int setSext(CPU_p cpu, int signLocation) {
 	return 1;
 }
 
+void trapGetc(CPU_p cpu) {
+	char c;
+	c = getchar();
+	int value = (int) c;
+	setRegister(cpu, value, 0);
+}
+
+void trapOut(CPU_p cpu) {
+	char c = (char)cpu->reg_file[0];
+	printf("%c", c);
+}
+
+
 /* Sets a given CPU's Register at given index
    IN: pointer to a CPU, unsigned integer input to set, index of register
    OUT: 1 if set operation is successful, -1 if POINTER_ERROR

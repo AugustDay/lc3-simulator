@@ -165,7 +165,8 @@ void initRegisters(CPU_p cpu) {
 }
 
 void initMemory() {
-   int i = 0;
+   memory[0] = 0xF020;
+   int i = 1;
    for(i; i < MEMORY_SIZE; i++) {
 	   memory[i] = 0x0000;	
    }
@@ -371,6 +372,7 @@ int controller (CPU_p cpu) {
 					 int trapVector = cpu->sext;
 					 switch (trapVector) {
 						 case GETC:
+							trapGetc(cpu);
 							printf("GETC");
 							break;
 						 case OUT:
