@@ -325,13 +325,28 @@ void trapGetc(CPU_p cpu) {
 	char c;
 	c = getchar();
 	int value = (int) c;
-	setRegister(cpu, value, 0);
+	setRegister(cpu, value, ZEROREGISTER);
 }
 
 void trapOut(CPU_p cpu) {
-	char c = (char)cpu->reg_file[0];
+	char c = (char)cpu->reg_file[ZEROREGISTER];
 	printf("%c", c);
 }
+
+void trapPuts(CPU_p cpu, unsigned short *memory) {
+	int address;
+	address = cpu->reg_file[ZEROREGISTER];
+	while (memory[address] != 0x0000) {
+		char c = (char) memory[address];
+		printf("%c", c);
+		address++;
+	}
+}
+
+void trapHalt(CPU_p cpu) {
+	printf("INSTRUCTION HALTED");
+}
+	
 
 
 /* Sets a given CPU's Register at given index

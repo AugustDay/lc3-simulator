@@ -38,6 +38,8 @@
 #define SIGN_MASK 0x0040  
 #define NEG_SIGN_EXTEND 0xFFC0 
 
+#define ZEROREGISTER 0
+
 /* Old OPCODES */
 
 // #define LDI 30
@@ -54,7 +56,7 @@
      // RET is the same command, basically (see Page 529 of textbook)
 #define JSR 4
 #define LEA 14
-#define LD 4
+#define LD 2
 #define LDR 6
 #define LDI 10
 #define ST 3
@@ -148,6 +150,9 @@ Byte getBaseR(CPU_p);
 Byte getTrapvect8(CPU_p);
 Byte getBit5(CPU_p);
 void trapGetc(CPU_p);
+void trapOut(CPU_p);
+void trapPuts(CPU_p cpu, unsigned short *memory);
+void trapHalt(CPU_p);
 
 //Utility functions
 void displayRegisterBinary(Register);

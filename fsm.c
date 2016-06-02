@@ -20,6 +20,7 @@
 #define FETCH_OP 3
 #define EXECUTE 4
 #define STORE 5
+#define HALTINSTRUCTION 6
 #define MEMORY_SIZE 3000
 
 unsigned short memory[MEMORY_SIZE]; 
@@ -191,8 +192,7 @@ void initRegisters(CPU_p cpu) {
 }
 
 void initMemory() {
-   memory[0] = 0xF020;
-   int i = 1;
+   int i = 0;
    for(i; i < MEMORY_SIZE; i++) {
 	   memory[i] = 0x0000;	
    }
@@ -402,22 +402,24 @@ int controller (CPU_p cpu) {
 							printf("GETC");
 							break;
 						 case OUT:
+							trapOut(cpu);
 							printf("OUT");
 							break;
 						 case PUTS:
+							trapPuts(cpu, memory);
 							printf("PUTS");
 							break;
 						 case HALT:
-							printf("HALT");
+							trapHalt(cpu);
 							break;
 						 break;
 					 }
 					 break;
-                   case HALT: 
-                      printf("HALT");
-                      break;
                 }
-              
+				if (cpu->sext == HALT) {
+					state = HALTINSTRUCTION;
+					break;
+				}
                 state = STORE;
                 break;
             case STORE:
@@ -463,6 +465,9 @@ int controller (CPU_p cpu) {
                 state = FETCH;              
                 break;
         }
+		if (state == HALTINSTRUCTION) {
+			break;
+		}
     }
     displayMemory(cpu, 0);
     printf("===========\n");
