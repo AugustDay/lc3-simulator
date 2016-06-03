@@ -220,9 +220,9 @@ Byte getOffset9(CPU_p cpu) {
 */
 Byte getOffset11(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
-	Register temp = cpu->ir & OFFSET11_MASK;
+	Register temp = cpu->ir & OFFSET11_MASK; 
 	return (Byte) temp;
-}
+} //TODO remove redundent functions (could go in getsext()
 
 /* Gets BaseR of a given CPU from the current ir
    IN: pointer to a CPU

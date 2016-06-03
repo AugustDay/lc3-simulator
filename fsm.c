@@ -38,12 +38,18 @@ void purgeBuffer() {
 
 void displayMemory(CPU_p cpu, int m) {
    int i = 0;
+   char c = 'N';
    printf("\nRegisters\tMemory\n==================================\n");
    for(i; i < NO_OF_REGISTERS; i++, m += 2) {
       printf("R%d: %.4X\t", i, getRegister(cpu, i));
       printf("0x%.4X: %.4X  %.4X\n", m, memory[m], memory[m + 1]);
    }
-   printf("\nPC: %.4X   SW: %.4X   IR: %.4X\n", cpu->pc, cpu->sw, getIR(cpu));
+   if (cpu->sw == 1) { 
+      c = 'P'; 
+   } else if (cpu->sw == 2) {
+      c = 'Z';      
+   } 
+   printf("\nPC: %.4X   SW: %c   IR: %.4X\n", cpu->pc, c, getIR(cpu));
 }
 
 FILE* openFile(char filename[]) {
@@ -100,7 +106,7 @@ int saveData(int m) {
 }
 
 int debug(CPU_p cpu) {
-   int m = 0, input = 8, repeat = 1;;
+   int m = cpu->pc, input = 8, repeat = 1;;
    unsigned short reg = 0;
    char* memoryLoc = malloc(sizeof(char) * 20);
    displayMemory(cpu, m);
@@ -234,7 +240,8 @@ int controller (CPU_p cpu) {
                    case BR: //TODO condense
                       setSext(cpu, OFFSET9_SIGN);
                       cpu->mar = cpu->pc + getSext(cpu);
-                      printf("mar = %d", cpu->mar);
+                      printf("mar = %d, sext = %d", cpu->mar, getSext(cpu));
+                      break;
                    case LDI:
                       setSext(cpu, OFFSET9_SIGN);
                       cpu->mar = cpu->pc + getSext(cpu);
@@ -310,8 +317,8 @@ int controller (CPU_p cpu) {
                       printf("ALU_A = %d, ALU_B = %d", getALU_A(cpu->alu), getALU_B(cpu->alu)); 
                       break;
                    case LD: 
-                      cpu->mdr = memory[cpu->mdr];  
-                      printf("mdr = memory[%d] = 0x%.4X", cpu->mdr, memory[cpu->mdr]);      
+                      cpu->mdr = memory[cpu->mar];  
+                      printf("mdr = memory[%d] = 0x%.4X", cpu->mar, memory[cpu->mar]);      
                       break;
                    case LDI: 
                      cpu->mdr = memory[cpu->mdr]; //not sure if this is where it goes.
@@ -384,10 +391,7 @@ int controller (CPU_p cpu) {
                    case LDI: 
                      cpu->mdr = memory[cpu->mar];
                      break;
-                   case LD: 
-                     cpu->mdr = memory[cpu->mar];
-                     printf("mdr = 0x%.4X", cpu->mdr);
-                     break;
+                   case LD: break;
                    case LDR:
                      cpu->mdr = memory[cpu->mar];
                      printf("mdr = 0x%.4X", cpu->mdr); 
@@ -509,6 +513,12 @@ int main (int argc, char *argv[]) {
    CPU_p cpu = constructCPU();
 	initCPU(cpu);
 
+  /* cpu->ir = 0x03FD;
+   cpu->sw = 1;
+   setSext(cpu, OFFSET9_SIGN);
+   printf("sext = %d\n", getSext(cpu)); */
+   
+   
    if(controller(cpu) == 1) {
 		printf("Operations completed successfully.\n");	
 	} else {
