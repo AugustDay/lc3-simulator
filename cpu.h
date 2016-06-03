@@ -24,21 +24,6 @@
 #define SR1_MASK 0x01C0
 #define SR2_MASK 0x0003
 
-#define IMMED5_MASK 0x001F
-#define OFFSET6_MASK 0x003F
-#define OFFSET9_MASK 0x01FF
-#define OFFSET11_MASK 0x07FF
-#define BASER_MASK 0x01C0
-#define TRAPVECT8_MASK 0x00FF
-#define BIT5_MASK 0x0020
-#define BIT11_MASK 0x0800
-
-#define RD_MASK 0x1C00
-#define RS_MASK 0x0380
-#define IMMED_MASK 0x007F
-#define SIGN_MASK 0x0040  
-#define NEG_SIGN_EXTEND 0xFFC0 
-
 #define ZEROREGISTER 0
 
 #define N_MASK 0x0004
@@ -75,27 +60,35 @@
 
 /* Sign-Extension codes */
 #define IMMED5_SIGN 0
+#define IMMED5_MASK 0x001F
 #define IMMED5_SIGN_MASK 0x0010
 #define IMMED5_SIGN_EXTEND 0xFFF0
 
 #define OFFSET6_SIGN 1
+#define OFFSET6_MASK 0x003F
 #define OFFSET6_SIGN_MASK 0x0020
 #define OFFSET6_SIGN_EXTEND 0xFFE0
 
 #define OFFSET9_SIGN 2
+#define OFFSET9_MASK 0x01FF
 #define OFFSET9_SIGN_MASK 0x0100
 #define OFFSET9_SIGN_EXTEND 0xFF00
 
 #define OFFSET11_SIGN 3
+#define OFFSET11_MASK 0x07FF
 #define OFFSET11_SIGN_MASK 0x0400
 #define OFFSET11_SIGN_EXTEND 0xFC00
 
 #define TRAPVECTOR_SIGN 4
+#define TRAPVECT8_MASK 0x00FF
 #define TRAPVECTOR_SIGN_MASK 0x0080
-#define TRAPVECTOR_SIGN_EXTEND 0xFFC0
+#define TRAPVECTOR_SIGN_EXTEND 0xFF00
 
 #define KBSR_MASK 0x8000
 #define KBDR_MASK 0x00FF
+#define BASER_MASK 0x01C0
+#define BIT5_MASK 0x0020
+#define BIT11_MASK 0x0800
 
 #define GETC 32
 #define OUT	 33
@@ -145,15 +138,14 @@ int setRegister(CPU_p, unsigned int, int);
 Register getIR(CPU_p);
 Register getSext(CPU_p);
 Register getRegister(CPU_p, int);
-Register getImmed(CPU_p);
+Register getImmed5(CPU_p);
+Register getOffset6(CPU_p);
+Register getOffset9(CPU_p);
+Register getOffset11(CPU_p);
 Byte getOPCODE(CPU_p);
 Byte getDR (CPU_p);
 Byte getSR1(CPU_p);
 Byte getSR2(CPU_p);
-Byte getImmed5(CPU_p);
-Byte getOffset6(CPU_p);
-Byte getOffset9(CPU_p);
-Byte getOffset11(CPU_p);
 Byte getBaseR(CPU_p);
 Byte getTrapvect8(CPU_p);
 Byte getBit5(CPU_p);
