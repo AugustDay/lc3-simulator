@@ -116,16 +116,6 @@ Register getIR (CPU_p cpu) {
 	return cpu->ir;
 }
 
-/* Gets the Immed portion's Register equivalent in the given CPU
-   IN: pointer to a CPU
-   OUT: Register immed7, POINTER_ERROR returned if given CPU is null
- */
-Register getImmed(CPU_p cpu) {
-   if (cpu == NULL) return POINTER_ERROR;
-   Register immed = cpu->ir & IMMED_MASK;
-   return (Byte) immed;
-}
-
 Register getSext(CPU_p cpu) {
    if (cpu == NULL) return POINTER_ERROR;
    return cpu->sext;
@@ -188,40 +178,40 @@ Byte getSR2(CPU_p cpu) {
    IN: pointer to a CPU
    OUT: Byte Immed5, POINTER_ERROR returned if given CPU is null
 */
-Byte getImmed5(CPU_p cpu) {
+Register getImmed5(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & IMMED5_MASK;
-	return (Byte) temp;
+	return temp;
 }
  
 /* Gets Offset6 of a given CPU from the current ir
    IN: pointer to a CPU
    OUT: Byte offset6, POINTER_ERROR returned if given CPU is null
 */
-Byte getOffset6(CPU_p cpu) {
+Register getOffset6(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & OFFSET6_MASK;
-	return (Byte) temp;
+	return temp;
 }
 
 /* Gets PCoffset9 of a given CPU from the current ir
    IN: pointer to a CPU
    OUT: Byte PCoffset9, POINTER_ERROR returned if given CPU is null
 */
-Byte getOffset9(CPU_p cpu) {
+Register getOffset9(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & OFFSET9_MASK;
-	return (Byte) temp;
+	return temp;
 }
 
 /* Gets PCoffset11 of a given CPU from the current ir
    IN: pointer to a CPU
    OUT: Byte PCoffset11, POINTER_ERROR returned if given CPU is null
 */
-Byte getOffset11(CPU_p cpu) {
+Register getOffset11(CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	Register temp = cpu->ir & OFFSET11_MASK; 
-	return (Byte) temp;
+	return temp;
 } //TODO remove redundent functions (could go in getsext()
 
 /* Gets BaseR of a given CPU from the current ir
@@ -300,7 +290,9 @@ int setSext(CPU_p cpu, int signLocation) {
          break;
       case OFFSET9_SIGN:
          immed = getOffset9(cpu);
+         displayRegisterBinary(immed);
          if (immed & OFFSET9_SIGN_MASK) {
+            printf("extended.\n");
             cpu->sext = immed | OFFSET9_SIGN_EXTEND;
          } else {
             cpu->sext = immed;  
@@ -357,7 +349,7 @@ void trapPuts(CPU_p cpu, unsigned short *memory) {
 }
 
 void trapHalt(CPU_p cpu) {
-	printf("INSTRUCTION HALTED");
+	printf("INSTRUCTION HALTED\n");
 }
 	
 int takeBranch(CPU_p cpu, Register r) {
@@ -408,11 +400,11 @@ int resetCPU(CPU_p cpu) {
 /* Prints the binary representation of this register (unsigned short). */
 void displayRegisterBinary(Register theR) {
     int i;
-    for (i = 15; i >= 0; i--) {
-       if(i == 12 || i == 9 || i == 6) {
+    for (i = 15; i >= 0; i--) {       
+       printf("%d", (theR & (1 << i)) >> i);
+       if(i % 4 == 0 && i > 1) {
           printf("|");  
        }
-       printf("%d", (theR & (1 << i)) >> i);
     }
    printf("\n");
 }

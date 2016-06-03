@@ -512,11 +512,6 @@ int main (int argc, char *argv[]) {
    //PREPARE CPU 
    CPU_p cpu = constructCPU();
 	initCPU(cpu);
-
-  /* cpu->ir = 0x03FD;
-   cpu->sw = 1;
-   setSext(cpu, OFFSET9_SIGN);
-   printf("sext = %d\n", getSext(cpu)); */
    
    
    if(controller(cpu) == 1) {
