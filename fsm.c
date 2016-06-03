@@ -192,19 +192,7 @@ void initRegisters(CPU_p cpu) {
 }
 
 void initMemory() {
-	memory[0] = 0xf020;
-	memory[1] = 0xf021;
-	memory[2] = 0x5020;
-	memory[3] = 0x1025;
-	memory[4] = 0xf022;
-	memory[5] = 0x0041;
-	memory[6] = 0x0042;
-	memory[7] = 0x0043;
-    int x = 8;
-	for (x; x < 90; x++) {
-		memory[x] = 59 + x;
-	}
-   int i = 90;
+   int i = 0;
    for(i; i < MEMORY_SIZE; i++) {
 	   memory[i] = 0x0000;	
    }
