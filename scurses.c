@@ -11,7 +11,7 @@ void clearScreen (void) {
 void moveCursor (int v, int h) {
 	char command[31];
 	sprintf (command, "%c[%d;%df", ASCII_ESC, v, h);
-	printf(command);
+	printf("%s", command);
 }
 
 void homeCursor (void) {
