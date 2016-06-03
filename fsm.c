@@ -428,31 +428,6 @@ int controller (CPU_p cpu) {
                            break;
                       }
                       break;
-<<<<<<< HEAD
-				   case TRAP:				 
-					 setSext(cpu, TRAPVECTOR_SIGN);
-					 int trapVector = cpu->sext;
-					 switch (trapVector) {
-						 case GETC:
-							printf("GETC");
-							trapGetc(cpu);
-							break;
-						 case OUT:
-							printf("OUT");
-							trapOut(cpu);
-							break;
-						 case PUTS:
-							printf("PUTS");
-							trapPuts(cpu, memory);
-							break;
-						 case HALT:
-							trapHalt(cpu);
-							break;
-						 break;
-					 }
-					 break;
-=======
->>>>>>> origin/master
                 }
                 if (cpu->sext == HALT) {
                    state = HALTINSTRUCTION;

@@ -101,15 +101,10 @@ int initCPU (CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	cpu->alu = constructALU();
 	// initialize register file with random numbers
-<<<<<<< HEAD
 	cpu->pc = 0;
 	cpu->ir = 0;
 	cpu->sext = 0;
-	char valuesToPrint[1];
-	cpu->print = valuesToPrint;
-=======
 	resetCPU(cpu); //TODO verify accuracy!
->>>>>>> origin/master
 }
 
 /* Gets the IR of the given CPU

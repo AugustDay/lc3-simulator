@@ -119,11 +119,7 @@ typedef struct cpu_s {
 	Register ir, pc, sw; 	// IR, PC, and SW (status word)
 	Register mar, mdr;
    Register sext;
-<<<<<<< HEAD
    Byte zero;
-   char *print;
-=======
->>>>>>> origin/master
 } CPU_s;
 
 typedef CPU_s * CPU_p;
@@ -161,6 +157,11 @@ Byte getOffset11(CPU_p);
 Byte getBaseR(CPU_p);
 Byte getTrapvect8(CPU_p);
 Byte getBit5(CPU_p);
+
+int takeBranch(CPU_p, Register);
+int setSW(CPU_p, int);
+
+//trap
 void trapGetc(CPU_p);
 void trapOut(CPU_p);
 void trapPuts(CPU_p cpu, unsigned short *memory);
