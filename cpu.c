@@ -60,7 +60,6 @@ Register alu_ADD(CPU_p cpu) {
    if (cpu == NULL) return POINTER_ERROR;
    if (cpu->alu == NULL) return POINTER_ERROR;
    cpu->alu->r = cpu->alu->a + cpu->alu->b;
-   setZeroFlag(cpu);
    return cpu->alu->r;
 }
 
@@ -72,7 +71,6 @@ Register alu_ADI(CPU_p cpu) {
    if (cpu == NULL) return POINTER_ERROR;
    if (cpu->alu == NULL) return POINTER_ERROR;
    cpu->alu->r = cpu->alu->a + cpu->alu->b;
-   setZeroFlag(cpu);
    return cpu->alu->r;
 }
 
@@ -84,7 +82,6 @@ Register alu_NAND(CPU_p cpu) {
    if (cpu == NULL) return POINTER_ERROR;
    if (cpu->alu == NULL) return POINTER_ERROR;
    cpu->alu->r = ~(cpu->alu->a & cpu->alu->b);
-   setZeroFlag(cpu);
    return cpu->alu->r;
 }
 
@@ -104,11 +101,15 @@ int initCPU (CPU_p cpu) {
 	if (cpu == NULL) return POINTER_ERROR;
 	cpu->alu = constructALU();
 	// initialize register file with random numbers
+<<<<<<< HEAD
 	cpu->pc = 0;
 	cpu->ir = 0;
 	cpu->sext = 0;
 	char valuesToPrint[1];
 	cpu->print = valuesToPrint;
+=======
+	resetCPU(cpu); //TODO verify accuracy!
+>>>>>>> origin/master
 }
 
 /* Gets the IR of the given CPU
@@ -260,6 +261,13 @@ Byte getBit5(CPU_p cpu) {
 	return (Byte) temp;	
 }
 
+int setSW(CPU_p cpu, int s) {
+	if (cpu == NULL) return POINTER_ERROR;
+   if (s < 0) { cpu->sw = N_MASK; }
+   if (s == 0) { cpu->sw = Z_MASK; }
+   if (s > 0) { cpu->sw = P_MASK; }
+   return 1;
+}
 
 /* Sets a given CPU's ir Register
    IN: pointer to a CPU, char input to set
@@ -357,7 +365,25 @@ void trapHalt(CPU_p cpu) {
 	printf("INSTRUCTION HALTED");
 }
 	
-
+int takeBranch(CPU_p cpu, Register r) {
+   if (cpu == NULL) return POINTER_ERROR;
+   if (r & N_BR_MASK) {
+      if (cpu->sw & N_MASK) {
+         return 1;  
+      }
+   }
+   if (r & Z_BR_MASK) {
+      if (cpu->sw & Z_MASK) {
+         return 1;  
+      }
+   }
+   if (r & P_BR_MASK) {
+      if (cpu->sw & P_MASK) {
+         return 1;  
+      }
+   }
+   return 0;
+}
 
 /* Sets a given CPU's Register at given index
    IN: pointer to a CPU, unsigned integer input to set, index of register
@@ -369,13 +395,6 @@ int setRegister(CPU_p cpu, unsigned int value, int index) {
    return 1; 
 }
 
-Byte setZeroFlag (CPU_p cpu) {
-	if (cpu == NULL) return POINTER_ERROR;
-	if (cpu->alu->r == 0) cpu->zero = 1;
-	else cpu->zero = 0;
-	return cpu->zero;
-}
-
 int resetCPU(CPU_p cpu) {
    if (cpu == NULL) return POINTER_ERROR;
    cpu->pc = 0;
@@ -384,7 +403,7 @@ int resetCPU(CPU_p cpu) {
    cpu->mar = 0;
    cpu->mdr = 0;
    cpu->sext = 0;
-   cpu->zero = 0;
+   cpu->sw = Z_MASK;
    cpu->alu->a = 0;
    cpu->alu->b = 0;
    cpu->alu->r = 0;

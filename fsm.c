@@ -43,7 +43,7 @@ void displayMemory(CPU_p cpu, int m) {
       printf("R%d: %.4X\t", i, getRegister(cpu, i));
       printf("0x%.4X: %.4X  %.4X\n", m, memory[m], memory[m + 1]);
    }
-   printf("\nPC: %.4X   SW: %.4X   IR: %.4X\n", cpu->pc, 0, getIR(cpu));
+   printf("\nPC: %.4X   SW: %.4X   IR: %.4X\n", cpu->pc, cpu->sw, getIR(cpu));
 }
 
 FILE* openFile(char filename[]) {
@@ -223,7 +223,7 @@ int controller (CPU_p cpu) {
                 opcode = getOPCODE(cpu);
                 dr = getDR(cpu);
                 sr1 = getSR1(cpu);
-              
+
                 printf("op = %d, dr = %d, sr1 = %d", opcode, dr, sr1);
                 state = EVAL_ADDR;
                 break;
@@ -231,6 +231,10 @@ int controller (CPU_p cpu) {
               	 printf("\nEVAL_ADDRESS: ");
                 switch (opcode) {
                    case ADD: break;
+                   case BR: //TODO condense
+                      setSext(cpu, OFFSET9_SIGN);
+                      cpu->mar = cpu->pc + getSext(cpu);
+                      printf("mar = %d", cpu->mar);
                    case LDI:
                       setSext(cpu, OFFSET9_SIGN);
                       cpu->mar = cpu->pc + getSext(cpu);
@@ -246,6 +250,10 @@ int controller (CPU_p cpu) {
                       cpu->mar = sr1 + getSext(cpu); //adds the base register with offset6
                       printf("mar = %d", cpu->mar);
                       break;
+                   case LEA:
+                      setSext(cpu, OFFSET9_SIGN);
+                      cpu->mar = cpu->pc + getSext(cpu);
+                      printf("mar = %d", cpu->mar);
                    case STI:
                       setSext(cpu, OFFSET9_SIGN);
                       cpu->mar = cpu->pc + getSext(cpu);
@@ -261,12 +269,12 @@ int controller (CPU_p cpu) {
                       cpu->mar = sr1 + getSext(cpu); //adds the base register with offset6
                       printf("mar = %d", cpu->mar);
                       break;
-                   case BNZ:
-                     /* branchAddress = cpu->pc + getSext(cpu);
-                      printf("branchAddress = %d", branchAddress); */
+                   case JSR:
+                      setSext(cpu, OFFSET11_SIGN);
+                      sr2 = cpu->pc; //temp variable
                       break;
-				   case TRAP:
-					  printf("TRAP");
+                   case TRAP:
+                      printf("TRAP");
                    case HALT: break;
                 }
               
@@ -333,7 +341,6 @@ int controller (CPU_p cpu) {
                      cpu->mdr = getRegister(cpu, dr);
                      printf("mdr = 0x%.4X", cpu->mdr); 
                      break;
-                   case BNZ: break;
                    case HALT: break;
                 }
 
@@ -357,7 +364,22 @@ int controller (CPU_p cpu) {
                         printf("AND 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
                      }
                      cpu->alu->r = (getALU_A(cpu->alu) & getALU_B(cpu->alu)); // ANDS the two registers.
-                     setZeroFlag(cpu);
+                     break;
+                   case BR:
+                     if(takeBranch(cpu, cpu->ir)) {
+                        cpu->pc = cpu->mar;
+                     }                      
+                     break;
+                   case JMP:
+                     cpu->pc = getRegister(cpu, sr1);
+                     break;
+                   case JSR:
+                     if(cpu->ir & BIT11_MASK) {
+                        cpu->pc = cpu->pc + cpu->sext;                        
+                     } else {
+                        cpu->pc = getRegister(cpu, sr1);
+                     }
+                     printf("PC = %d", cpu->pc);
                      break;
                    case LDI: 
                      cpu->mdr = memory[cpu->mar];
@@ -384,14 +406,29 @@ int controller (CPU_p cpu) {
                      memory[cpu->mar] = cpu->mdr;
                      printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); 
                      break;
-                   case BNZ:                     
-                     /* if (cpu->zero) {                         
-                         cpu->pc = branchAddress;
-                         printf("Branch taken.");
-                      } else {
-                         printf("Branch not taken.");  
-                      } */
+                   case TRAP:				 
+                     setSext(cpu, TRAPVECTOR_SIGN);
+                     int trapVector = cpu->sext;
+                     setRegister(cpu, cpu->pc, 7); //in actual LC3, this is for RET to read.
+                     switch (trapVector) {
+                        case GETC:
+                           trapGetc(cpu);
+                           printf("GETC");
+                           break;
+                        case OUT:
+                           trapOut(cpu);
+                           printf("OUT");
+                           break;
+                        case PUTS:
+                           trapPuts(cpu, memory);
+                           printf("PUTS");
+                           break;
+                        case HALT:
+                           trapHalt(cpu);
+                           break;
+                      }
                       break;
+<<<<<<< HEAD
 				   case TRAP:				 
 					 setSext(cpu, TRAPVECTOR_SIGN);
 					 int trapVector = cpu->sext;
@@ -414,11 +451,13 @@ int controller (CPU_p cpu) {
 						 break;
 					 }
 					 break;
+=======
+>>>>>>> origin/master
                 }
-				if (cpu->sext == HALT) {
-					state = HALTINSTRUCTION;
-					break;
-				}
+                if (cpu->sext == HALT) {
+                   state = HALTINSTRUCTION;
+                   break;
+                }
                 state = STORE;
                 break;
             case STORE:
@@ -426,30 +465,44 @@ int controller (CPU_p cpu) {
                 switch (opcode) {
                    case ADD: 
                       setRegister(cpu, getALU_R(cpu->alu), dr); 
+                      setSW(cpu, getALU_R(cpu->alu));
                       printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu)); 
                       break;
-				   case AND:
+				       case AND:
                       setRegister(cpu, getALU_R(cpu->alu), dr);
+                      setSW(cpu, getALU_R(cpu->alu));
                       printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu));
                       break;
-                   case LDI:
+                   case JSR:
+                      cpu->reg_file[7] = sr2;
+                      printf("R7 = 0x%.4X", cpu->reg_file[7]);
+                      break;
+                   case LDI: //TODO LDI, LD, and LDR are all same here, condense.
                       cpu->reg_file[dr] = cpu->mdr;
+                      setSW(cpu, cpu->mdr);
                       printf("reg_file[%d] = 0x%.4X", dr, cpu->mdr);
                       break;
                    case LD:
                       cpu->reg_file[dr] = cpu->mdr;
+                      setSW(cpu, cpu->mdr);
                       printf("reg_file[%d] = 0x%.4X", dr, cpu->mdr);
                       break;
 				       case LDR:
 					       cpu->reg_file[dr] = cpu->mdr;
+                      setSW(cpu, cpu->mdr);
 					       printf("reg_file[%d] = 0x%.4X", dr, cpu->mdr);
+                      break;
+                   case LEA: /* Need setSW() */ 
+                      cpu->reg_file[dr] = cpu->mar;
+                      setSW(cpu, cpu->mdr);
+					       printf("reg_file[%d] = 0x%.4X", dr, cpu->mar);
                       break;
 				       case NOT:
 					       setRegister(cpu, getALU_R(cpu->alu), dr);
+                      setSW(cpu, getALU_R(cpu->alu));
 					       printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu)); 
                       break;
                    case ST: break;
-                   case BNZ: break;
                    case HALT: break;
                 }			
                 printf("\n===========\n");
@@ -462,7 +515,7 @@ int controller (CPU_p cpu) {
                 cpu->alu->a = 0;
                 cpu->alu->b = 0;
                 state = FETCH;              
-                break;
+                break; 
         }
 		if (state == HALTINSTRUCTION) {
 			break;
@@ -481,7 +534,6 @@ int main (int argc, char *argv[]) {
    CPU_p cpu = constructCPU();
 	initCPU(cpu);
 
-  
    if(controller(cpu) == 1) {
 		printf("Operations completed successfully.\n");	
 	} else {

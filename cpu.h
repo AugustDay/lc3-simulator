@@ -31,6 +31,7 @@
 #define BASER_MASK 0x01C0
 #define TRAPVECT8_MASK 0x00FF
 #define BIT5_MASK 0x0020
+#define BIT11_MASK 0x0800
 
 #define RD_MASK 0x1C00
 #define RS_MASK 0x0380
@@ -40,10 +41,17 @@
 
 #define ZEROREGISTER 0
 
+#define N_MASK 0x0004
+#define Z_MASK 0x0002
+#define P_MASK 0x0001
+#define N_BR_MASK 0x0800
+#define Z_BR_MASK 0x0400
+#define P_BR_MASK 0x0200
+
+
 /* Old OPCODES */
 
 // #define LDI 30
-#define BNZ 60
 // #define HALT 70
 
 /* New OPCODES, in order they appear on Page 119 of textbook */
@@ -111,8 +119,11 @@ typedef struct cpu_s {
 	Register ir, pc, sw; 	// IR, PC, and SW (status word)
 	Register mar, mdr;
    Register sext;
+<<<<<<< HEAD
    Byte zero;
    char *print;
+=======
+>>>>>>> origin/master
 } CPU_s;
 
 typedef CPU_s * CPU_p;
@@ -135,7 +146,6 @@ int resetCPU(CPU_p);
 int setIR (CPU_p, char*);
 int setSext(CPU_p, int);
 int setRegister(CPU_p, unsigned int, int);
-Byte setZeroFlag(CPU_p);
 Register getIR(CPU_p);
 Register getSext(CPU_p);
 Register getRegister(CPU_p, int);
