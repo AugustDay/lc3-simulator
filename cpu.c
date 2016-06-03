@@ -107,6 +107,8 @@ int initCPU (CPU_p cpu) {
 	cpu->pc = 0;
 	cpu->ir = 0;
 	cpu->sext = 0;
+	char valuesToPrint[1];
+	cpu->print = valuesToPrint;
 }
 
 /* Gets the IR of the given CPU
@@ -323,23 +325,31 @@ int setSext(CPU_p cpu, int signLocation) {
 
 void trapGetc(CPU_p cpu) {
 	char c;
-	c = getchar();
+	c = getch();
 	int value = (int) c;
 	setRegister(cpu, value, ZEROREGISTER);
 }
 
 void trapOut(CPU_p cpu) {
 	char c = (char)cpu->reg_file[ZEROREGISTER];
-	printf("%c", c);
+	printf("				> %c", c);
+
 }
 
 void trapPuts(CPU_p cpu, unsigned short *memory) {
 	int address;
 	address = cpu->reg_file[ZEROREGISTER];
+	printf("				> ");
+	int i = 0;
 	while (memory[address] != 0x0000) {
 		char c = (char) memory[address];
 		printf("%c", c);
 		address++;
+		if (i >= NEWLINE) {
+			printf("\n					  ");
+			i =0;
+		}
+		i++;
 	}
 }
 

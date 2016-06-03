@@ -192,7 +192,19 @@ void initRegisters(CPU_p cpu) {
 }
 
 void initMemory() {
-   int i = 0;
+	memory[0] = 0xf020;
+	memory[1] = 0xf021;
+	memory[2] = 0x5020;
+	memory[3] = 0x1025;
+	memory[4] = 0xf022;
+	memory[5] = 0x0041;
+	memory[6] = 0x0042;
+	memory[7] = 0x0043;
+    int x = 8;
+	for (x; x < 90; x++) {
+		memory[x] = 59 + x;
+	}
+   int i = 90;
    for(i; i < MEMORY_SIZE; i++) {
 	   memory[i] = 0x0000;	
    }
@@ -203,12 +215,11 @@ int controller (CPU_p cpu) {
     if (cpu->alu == NULL) return POINTER_ERROR;
 	 unsigned int state = FETCH;
 	 Register branchAddress;
-	 Byte opcode = 0, dr = 0, sr1 = 0, sr2 = 0, bit5 = 0;
-	
+	 Byte opcode = 0, dr = 0, sr1 = 0, sr2 = 0, bit5 = 0;	
 	 initMemory();
 	 initRegisters(cpu);
-   
-    
+	 clearScreen();
+	 homeCursor();   
     for(;;) {   // efficient endless loop
         switch (state) {
             case FETCH: 
@@ -341,21 +352,21 @@ int controller (CPU_p cpu) {
                 state = EXECUTE;
                 break;
             case EXECUTE:
-				    printf("\nEXECUTE: ");
+				printf("\nEXECUTE: ");
                 switch (opcode) {
-                   case ADD: 
+                   case ADD: 								   
                       if(bit5) {
                          printf("ADD(I) 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
                       } else {
-							    printf("ADD 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
+						 printf("ADD 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
                       }
-						    alu_ADD(cpu);
-							 break;
+						alu_ADD(cpu);
+						break;
                    case AND:
                      if(bit5) {
                         printf("AND(I) 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));	
                      } else {
-                        printf("ADD 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
+                        printf("AND 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
                      }
                      cpu->alu->r = (getALU_A(cpu->alu) & getALU_B(cpu->alu)); // ANDS the two registers.
                      setZeroFlag(cpu);
@@ -398,16 +409,16 @@ int controller (CPU_p cpu) {
 					 int trapVector = cpu->sext;
 					 switch (trapVector) {
 						 case GETC:
-							trapGetc(cpu);
 							printf("GETC");
+							trapGetc(cpu);
 							break;
 						 case OUT:
-							trapOut(cpu);
 							printf("OUT");
+							trapOut(cpu);
 							break;
 						 case PUTS:
-							trapPuts(cpu, memory);
 							printf("PUTS");
+							trapPuts(cpu, memory);
 							break;
 						 case HALT:
 							trapHalt(cpu);

@@ -94,6 +94,7 @@
 #define PUTS 34
 #define HALT 37
 
+#define NEWLINE 35
 
 typedef unsigned short Register;
 typedef unsigned char Byte;
@@ -111,6 +112,7 @@ typedef struct cpu_s {
 	Register mar, mdr;
    Register sext;
    Byte zero;
+   char *print;
 } CPU_s;
 
 typedef CPU_s * CPU_p;
@@ -158,6 +160,12 @@ void trapHalt(CPU_p);
 void displayRegisterBinary(Register);
 void displayByteBinary(Byte);
 void purgeBuffer();
+
+//Scurses
+char getch();
+void moveCursor (int, int);
+void homeCursor (void);
+void clearScreen (void);
 
 //Debug and simulator initialization
 int debug(CPU_p);
