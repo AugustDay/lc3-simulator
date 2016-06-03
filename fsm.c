@@ -443,7 +443,7 @@ int controller (CPU_p cpu) {
                       setSW(cpu, getALU_R(cpu->alu));
                       printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu)); 
                       break;
-				       case AND:
+				   case AND:
                       setRegister(cpu, getALU_R(cpu->alu), dr);
                       setSW(cpu, getALU_R(cpu->alu));
                       printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu));
