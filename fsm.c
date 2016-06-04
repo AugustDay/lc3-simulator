@@ -107,7 +107,7 @@ int saveData(int m) {
 }
 
 int debug(CPU_p cpu) {
-   int m = cpu->pc, input = 8, repeat = 1;;
+   int m = cpu->pc, input = 8, repeat = 1, run = 0;;
    unsigned short reg = 0;
    char* memoryLoc = malloc(sizeof(char) * 20);
    displayMemory(cpu, m);
@@ -134,6 +134,11 @@ int debug(CPU_p cpu) {
 			printf("\tSaving memory into output.hex ... ");
 			saveData(m);
 			printf("done.\n");
+			break;
+		 case 3:
+		    printf("\tRunning..");
+			run = 1;
+			input = 0;
 			break;
          case 4: //STEP
             input = 0;
@@ -189,6 +194,7 @@ int debug(CPU_p cpu) {
       
    }
    free(memoryLoc);
+   return run;
 }
 
 void initRegisters(CPU_p cpu) {
@@ -211,12 +217,15 @@ int controller (CPU_p cpu) {
 	 unsigned int state = FETCH;
 	 Register branchAddress;
 	 Byte opcode = 0, dr = 0, sr1 = 0, sr2 = 0, bit5 = 0;	
+	 int run = 0;
 	 initMemory();
 	 initRegisters(cpu); 
     for(;;) {   // efficient endless loop
         switch (state) {
             case FETCH: 
-                debug(cpu);
+				if (run == 0) {
+					run = debug(cpu);
+				}
                 printf("===========\nFETCH: ");
                 cpu->mar = cpu->pc++;  
                 cpu->ir = memory[cpu->mar];                
