@@ -3,7 +3,7 @@
 	
 	Programmer: George Mobus
    Austin Ingraham, Arthur Panlilio
-	Date: 4/20/16
+	Date: 6/3/16
 	Descritption:
 		This file contains the implementation code for the CPU class.
 */
@@ -247,10 +247,10 @@ Byte getBit5(CPU_p cpu) {
 }
 
 int setSW(CPU_p cpu, int s) {
-	if (cpu == NULL) return POINTER_ERROR;
-   if (s < 0) { cpu->sw = N_MASK; }
+   if (cpu == NULL) return POINTER_ERROR;
+   if (s >= 0x8000) { cpu->sw = N_MASK; }
    if (s == 0) { cpu->sw = Z_MASK; }
-   if (s > 0) { cpu->sw = P_MASK; }
+   if (s > 0 && s < 0x8000) { cpu->sw = P_MASK; }
    return 1;
 }
 
@@ -336,13 +336,13 @@ void trapPuts(CPU_p cpu, unsigned short *memory) {
 	address = cpu->reg_file[ZEROREGISTER];
 	printf("				> ");
 	int i = 0;
-	while (memory[address] != 0x0000) {
+	while (memory[address] != 0) {
 		char c = (char) memory[address];
 		printf("%c", c);
 		address++;
 		if (i >= NEWLINE) {
 			printf("\n					  ");
-			i =0;
+			i = 0;
 		}
 		i++;
 	}

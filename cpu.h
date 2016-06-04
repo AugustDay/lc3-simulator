@@ -3,7 +3,7 @@
 	
     Programer: George Mobus
     Austin Ingraham, Arthur Panlilio
-	 Date: 4/20/16
+	 Date: 6/3/16
 	 Description:
 	   This header file contains the definitions for the CPU object.
 */
@@ -22,7 +22,7 @@
 #define OPCODE_MASK 0xF000
 #define DR_MASK 0x0E00
 #define SR1_MASK 0x01C0
-#define SR2_MASK 0x0003
+#define SR2_MASK 0x0007
 
 #define ZEROREGISTER 0
 

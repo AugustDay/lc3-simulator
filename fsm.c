@@ -2,8 +2,9 @@
 	fsu.c
 	
    Austin Ingraham
+   Arthur Panlilio
    Based on starter code by Professor George Mobus
-	Date: 4/27/16
+	Date: 6/3/16
 	Descritption:
 		This file contains the implementation code for simulating a Finite State Machine
 */
@@ -211,9 +212,7 @@ int controller (CPU_p cpu) {
 	 Register branchAddress;
 	 Byte opcode = 0, dr = 0, sr1 = 0, sr2 = 0, bit5 = 0;	
 	 initMemory();
-	 initRegisters(cpu);
-	 clearScreen();
-	 homeCursor();   
+	 initRegisters(cpu); 
     for(;;) {   // efficient endless loop
         switch (state) {
             case FETCH: 
@@ -378,9 +377,11 @@ int controller (CPU_p cpu) {
                      }                      
                      break;
                    case JMP:
+					 printf("JMP");
                      cpu->pc = getRegister(cpu, sr1);
                      break;
                    case JSR:
+					 printf("JSR");
                      if(cpu->ir & BIT11_MASK) {
                         cpu->pc = cpu->pc + cpu->sext;                        
                      } else {
@@ -389,24 +390,32 @@ int controller (CPU_p cpu) {
                      printf("PC = %d", cpu->pc);
                      break;
                    case LDI: 
+				     printf("LDI");
                      cpu->mdr = memory[cpu->mar];
                      break;
-                   case LD: break;
+                   case LD: 
+					 printf("LD");
+					 break;
                    case LDR:
+				     printf("LDR");
                      cpu->mdr = memory[cpu->mar];
                      printf("mdr = 0x%.4X", cpu->mdr); 
                    case NOT:
+				     printf("NOT");
                      cpu->alu->r = ~(getALU_A(cpu->alu));
                      break;
                    case STI:
+				     printf("STI");
                      memory[cpu->mar] = cpu->mdr;
                      printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); 
                      break;
                    case ST:
+				     printf("ST");
                      memory[cpu->mar] = cpu->mdr;
                      printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); 
                      break;
                    case STR:
+				     printf("STR");
                      memory[cpu->mar] = cpu->mdr;
                      printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); 
                      break;
@@ -420,12 +429,12 @@ int controller (CPU_p cpu) {
                            printf("GETC");
                            break;
                         case OUT:
+						    printf("OUT");
                            trapOut(cpu);
-                           printf("OUT");
                            break;
                         case PUTS:
-                           trapPuts(cpu, memory);
-                           printf("PUTS");
+						    printf("PUTS");
+                           trapPuts(cpu, memory);                       
                            break;
                         case HALT:
                            trapHalt(cpu);

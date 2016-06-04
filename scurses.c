@@ -38,18 +38,3 @@ char getch() {
         return (buf);
 }
 
-// int main() {
-	// clearScreen();
-	// moveCursor(8,0);
-	// printf("hello\n");
-	// homeCursor();
-	// printf("AJFALWFJ\nFHWOFHO");
-	// fflush(stdout);
-	// char c;
-	// getchar();
-	// c = getch();
-	// moveCursor(8,20);
-	// printf("%c\n", c);
-	// moveCursor(11,0);
-	// printf("WHWHWH\nFWFWF\n");
-// }
