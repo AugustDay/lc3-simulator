@@ -11,6 +11,7 @@
 
 #include "cpu.h"
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -80,18 +81,20 @@ FILE* getInputFile() {
 }
 
 int loadData() {
+	int i = 0;
    char line[10];
    FILE* file = getInputFile();
    printf("\tFound the file, loading data... ");
-   fgets(line, sizeof(line), file);
-   Register startingIndex = strtol(line, NULL, 16);
-   int i = startingIndex;
+   // fgets(line, sizeof(line), file);
+   // Register startingIndex = strtol(line, NULL, 16);
+   // int i = startingIndex;
    while (fgets(line, sizeof(line), file) && i < MEMORY_SIZE) {
       memory[i] = strtol(line, NULL, 16);
       i++;
    }
    printf("done.\n");
-   return startingIndex;  
+   //return startingIndex;  
+   return 1;
 }
 
 int saveData(int m) {
@@ -122,8 +125,10 @@ int debug(CPU_p cpu) {
       purgeBuffer();
       switch(input) {
          case 1: //LOAD OBJECT FILE
-            cpu->pc = loadData();   
-            displayMemory(cpu, cpu->pc);
+			loadData();
+			displayMemory(cpu, m);
+            // cpu->pc = loadData();   
+            // displayMemory(cpu, cpu->pc);
             break;
 		 case 2:
 			printf("\tChoose terminating index of memory to output, (0 - %d)\n\t> ", (MEMORY_SIZE - 1));
@@ -208,7 +213,7 @@ void initRegisters(CPU_p cpu) {
 
 void initMemory() {
    int i = 0;
-   for(i; i < MEMORY_SIZE - 1; i++) {
+   for(i; i < MEMORY_SIZE; i++) {
 	   memory[i] = 0x0000;	
    }
    memory[i] = 0xF025;
