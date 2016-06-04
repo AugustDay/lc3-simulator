@@ -234,77 +234,61 @@ int controller (CPU_p cpu) {
 				if (run == 0) {
 					run = debug(cpu);
 				}
-                printf("===========\nFETCH: ");
                 cpu->mar = cpu->pc++;  
                 cpu->ir = memory[cpu->mar];                
-                printf("Contents of IR = 0x%04X\n", getIR(cpu));
                 state = DECODE;
                 break;
             case DECODE:
-                printf("DECODE: ");
                 opcode = getOPCODE(cpu);
                 dr = getDR(cpu);
                 sr1 = getSR1(cpu);
-
-                printf("op = %d, dr = %d, sr1 = %d", opcode, dr, sr1);
                 state = EVAL_ADDR;
                 break;
             case EVAL_ADDR:
-              	 printf("\nEVAL_ADDRESS: ");
                 switch (opcode) {
                    case ADD: break;
                    case BR: //TODO condense
                       setSext(cpu, OFFSET9_SIGN);
                       cpu->mar = cpu->pc + getSext(cpu);
-                      printf("mar = %d, sext = %d", cpu->mar, getSext(cpu));
                       break;
                    case LDI:
                       setSext(cpu, OFFSET9_SIGN);
                       cpu->mar = cpu->pc + getSext(cpu);
-                      printf("mar = %d", cpu->mar);
 				          break;
                    case LD:
                       setSext(cpu, OFFSET9_SIGN);
                       cpu->mar = cpu->pc + getSext(cpu);
-                      printf("mar = %d", cpu->mar); 
                       break;
                    case LDR:
                       setSext(cpu, OFFSET6_SIGN);
                       cpu->mar = sr1 + getSext(cpu); //adds the base register with offset6
-                      printf("mar = %d", cpu->mar);
                       break;
                    case LEA:
                       setSext(cpu, OFFSET9_SIGN);
                       cpu->mar = cpu->pc + getSext(cpu);
-                      printf("mar = %d", cpu->mar);
                    case STI:
                       setSext(cpu, OFFSET9_SIGN);
                       cpu->mar = cpu->pc + getSext(cpu);
-                      printf("mar = %d", cpu->mar);
                       break;
                    case ST:
                       setSext(cpu, OFFSET9_SIGN);
                       cpu->mar = cpu->pc + getSext(cpu);
-                      printf("mar = %d", cpu->mar); 
                       break;
                    case STR:
                       setSext(cpu, OFFSET6_SIGN);
                       cpu->mar = sr1 + getSext(cpu); //adds the base register with offset6
-                      printf("mar = %d", cpu->mar);
                       break;
                    case JSR:
                       setSext(cpu, OFFSET11_SIGN);
                       sr2 = cpu->pc; //temp variable
                       break;
                    case TRAP:
-                      printf("TRAP");
                    case HALT: break;
                 }
               
                 state = FETCH_OP;
                 break;
             case FETCH_OP:
-				   printf("\nFETCH_OP: ");
 				   switch (opcode) {
                    case ADD:
                       bit5 = getBit5(cpu);
@@ -317,7 +301,6 @@ int controller (CPU_p cpu) {
                          cpu->alu->a = getRegister(cpu, sr1);	// get first operand
                          cpu->alu->b = getRegister(cpu, sr2);	// get second operand
                       }                      
-                      printf("ALU_A = %d, ALU_B = %d", getALU_A(cpu->alu), getALU_B(cpu->alu)); 
                       break; 
                    case AND:
                       bit5 = getBit5(cpu);
@@ -330,39 +313,31 @@ int controller (CPU_p cpu) {
                          cpu->alu->a = getRegister(cpu, sr1); // get first operand
                          cpu->alu->b = getRegister(cpu, sr2); // get second operand
                       }
-                      printf("ALU_A = %d, ALU_B = %d", getALU_A(cpu->alu), getALU_B(cpu->alu)); 
                       break;
                    case LD: 
-                      cpu->mdr = memory[cpu->mar];  
-                      printf("mdr = memory[%d] = 0x%.4X", cpu->mar, memory[cpu->mar]);      
+                      cpu->mdr = memory[cpu->mar];      
                       break;
                    case LDI: 
                      cpu->mdr = memory[cpu->mdr]; //not sure if this is where it goes.
                      cpu->mdr = memory[cpu->mar];
                      cpu->mar = cpu->mdr;
-                     printf("mdr = 0x%.4X", cpu->mdr); 
                      break;
                    case LDR:
                      cpu->mdr = memory[cpu->mdr];
-                     printf("mdr = memory[%d] = 0x%.4X", cpu->mdr, memory[cpu->mdr]); 
                      break;
                    case NOT:
                      cpu->alu->a = getRegister(cpu, sr1); // get first operand
-                     printf("ALU_A = %d", getALU_A(cpu->alu));
                      break;
                    case STI:
                      cpu->mdr = memory[cpu->mar]; //not sure if this is where it goes.
                      cpu->mar = cpu->mdr;
-                     cpu->mdr = getRegister(cpu, dr);
-                     printf("mdr = 0x%.4X", cpu->mdr); 
+                     cpu->mdr = getRegister(cpu, dr); 
                      break;
                    case ST: 
                      cpu->mdr = getRegister(cpu, dr); //dr is the register value to put into memory
-                     printf("mdr = 0x%.4X", cpu->mdr); 
                      break;
                    case STR:
                      cpu->mdr = getRegister(cpu, dr);
-                     printf("mdr = 0x%.4X", cpu->mdr); 
                      break;
                    case HALT: break;
                 }
@@ -370,22 +345,11 @@ int controller (CPU_p cpu) {
                 state = EXECUTE;
                 break;
             case EXECUTE:
-				printf("\nEXECUTE: ");
                 switch (opcode) {
                    case ADD: 								   
-                      if(bit5) {
-                         printf("ADD(I) 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
-                      } else {
-						 printf("ADD 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
-                      }
 						alu_ADD(cpu);
 						break;
                    case AND:
-                     if(bit5) {
-                        printf("AND(I) 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));	
-                     } else {
-                        printf("AND 0x%X, 0x%X", getALU_A(cpu->alu), getALU_B(cpu->alu));
-                     }
                      cpu->alu->r = (getALU_A(cpu->alu) & getALU_B(cpu->alu)); // ANDS the two registers.
                      break;
                    case BR:
@@ -394,47 +358,33 @@ int controller (CPU_p cpu) {
                      }                      
                      break;
                    case JMP:
-					 printf("JMP");
                      cpu->pc = getRegister(cpu, sr1);
                      break;
                    case JSR:
-					 printf("JSR");
                      if(cpu->ir & BIT11_MASK) {
                         cpu->pc = cpu->pc + cpu->sext;                        
                      } else {
                         cpu->pc = getRegister(cpu, sr1);
                      }
-                     printf("PC = %d", cpu->pc);
                      break;
                    case LDI: 
-				     printf("LDI");
                      cpu->mdr = memory[cpu->mar];
                      break;
                    case LD: 
-					 printf("LD");
 					 break;
                    case LDR:
-				     printf("LDR");
                      cpu->mdr = memory[cpu->mar];
-                     printf("mdr = 0x%.4X", cpu->mdr); 
                    case NOT:
-				     printf("NOT");
                      cpu->alu->r = ~(getALU_A(cpu->alu));
                      break;
                    case STI:
-				     printf("STI");
                      memory[cpu->mar] = cpu->mdr;
-                     printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); 
                      break;
                    case ST:
-				     printf("ST");
                      memory[cpu->mar] = cpu->mdr;
-                     printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); 
                      break;
                    case STR:
-				     printf("STR");
                      memory[cpu->mar] = cpu->mdr;
-                     printf("memory[0x%.4X] = 0x%.4X", cpu->mar, cpu->mdr); 
                      break;
                    case TRAP:				 
                      setSext(cpu, TRAPVECTOR_SIGN);
@@ -443,14 +393,11 @@ int controller (CPU_p cpu) {
                      switch (trapVector) {
                         case GETC:
                            trapGetc(cpu);
-                           printf("GETC");
                            break;
                         case OUT:
-						    printf("OUT");
                            trapOut(cpu);
                            break;
                         case PUTS:
-						    printf("PUTS");
                            trapPuts(cpu, memory);                       
                            break;
                         case HALT:
@@ -466,51 +413,41 @@ int controller (CPU_p cpu) {
                 state = STORE;
                 break;
             case STORE:
-				    printf("\nSTORE: ");
                 switch (opcode) {
                    case ADD: 
                       setRegister(cpu, getALU_R(cpu->alu), dr); 
                       setSW(cpu, getALU_R(cpu->alu));
-                      printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu)); 
                       break;
 				   case AND:
                       setRegister(cpu, getALU_R(cpu->alu), dr);
                       setSW(cpu, getALU_R(cpu->alu));
-                      printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu));
                       break;
                    case JSR:
                       cpu->reg_file[7] = sr2;
-                      printf("R7 = 0x%.4X", cpu->reg_file[7]);
                       break;
                    case LDI: //TODO LDI, LD, and LDR are all same here, condense.
                       cpu->reg_file[dr] = cpu->mdr;
                       setSW(cpu, cpu->mdr);
-                      printf("reg_file[%d] = 0x%.4X", dr, cpu->mdr);
                       break;
                    case LD:
                       cpu->reg_file[dr] = cpu->mdr;
                       setSW(cpu, cpu->mdr);
-                      printf("reg_file[%d] = 0x%.4X", dr, cpu->mdr);
                       break;
 				       case LDR:
 					       cpu->reg_file[dr] = cpu->mdr;
                       setSW(cpu, cpu->mdr);
-					       printf("reg_file[%d] = 0x%.4X", dr, cpu->mdr);
                       break;
                    case LEA: /* Need setSW() */ 
                       cpu->reg_file[dr] = cpu->mar;
                       setSW(cpu, cpu->mdr);
-					       printf("reg_file[%d] = 0x%.4X", dr, cpu->mar);
                       break;
 				       case NOT:
 					       setRegister(cpu, getALU_R(cpu->alu), dr);
-                      setSW(cpu, getALU_R(cpu->alu));
-					       printf("reg_file[%d] = 0x%.4X", dr, getALU_R(cpu->alu)); 
+						setSW(cpu, getALU_R(cpu->alu));
                       break;
                    case ST: break;
                    case HALT: break;
                 }			
-                printf("\n===========\n");
 					 
                 //zero-out everything                          
                 dr = 0;
@@ -527,7 +464,6 @@ int controller (CPU_p cpu) {
 		}
     }
     displayMemory(cpu, 0);
-    printf("===========\n");
 	 return 1;
 }
 

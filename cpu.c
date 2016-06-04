@@ -318,31 +318,27 @@ int setSext(CPU_p cpu, int signLocation) {
 
 void trapGetc(CPU_p cpu) {
 	char c;
-	c = getch();
+	c = getchar();
 	int value = (int) c;
 	setRegister(cpu, value, ZEROREGISTER);
+	purgeBuffer();
+	
 }
 
 void trapOut(CPU_p cpu) {
 	char c = (char)cpu->reg_file[ZEROREGISTER];
-	printf("				> %c", c);
+	printf("\n> %c", c);
 
 }
 
 void trapPuts(CPU_p cpu, unsigned short *memory) {
 	int address;
 	address = cpu->reg_file[ZEROREGISTER];
-	printf("				> ");
-	int i = 0;
+	printf("\n> ");
 	while (memory[address] != 0) {
 		char c = (char) memory[address];
 		printf("%c", c);
 		address++;
-		if (i >= NEWLINE) {
-			printf("\n					  ");
-			i = 0;
-		}
-		i++;
 	}
 }
 
