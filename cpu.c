@@ -327,14 +327,14 @@ void trapGetc(CPU_p cpu) {
 
 void trapOut(CPU_p cpu) {
 	char c = (char)cpu->reg_file[ZEROREGISTER];
-	printf("\n> %c", c);
+	printf("%c", c);
 
 }
 
 void trapPuts(CPU_p cpu, unsigned short *memory) {
 	int address;
 	address = cpu->reg_file[ZEROREGISTER];
-	//printf("\n> ");
+	printf("\n> ");
 	while (memory[address] != 0) {
 		char c = (char) memory[address];
 		printf("%c", c);
