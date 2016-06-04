@@ -334,7 +334,7 @@ void trapOut(CPU_p cpu) {
 void trapPuts(CPU_p cpu, unsigned short *memory) {
 	int address;
 	address = cpu->reg_file[ZEROREGISTER];
-	printf("\n> ");
+	//printf("\n> ");
 	while (memory[address] != 0) {
 		char c = (char) memory[address];
 		printf("%c", c);
@@ -343,7 +343,7 @@ void trapPuts(CPU_p cpu, unsigned short *memory) {
 }
 
 void trapHalt(CPU_p cpu) {
-	printf("INSTRUCTION HALTED\n");
+	printf("\nINSTRUCTION HALTED\n");
 }
 	
 int takeBranch(CPU_p cpu, Register r) {

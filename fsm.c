@@ -143,7 +143,7 @@ int debug(CPU_p cpu) {
 			printf("done.\n");
 			break;
 		 case 3:
-		    printf("\tRunning..");
+		    printf("\tRunning...\n");
 			run = 1;
 			input = 0;
 			break;
