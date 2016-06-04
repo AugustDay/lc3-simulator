@@ -290,9 +290,7 @@ int setSext(CPU_p cpu, int signLocation) {
          break;
       case OFFSET9_SIGN:
          immed = getOffset9(cpu);
-         displayRegisterBinary(immed);
          if (immed & OFFSET9_SIGN_MASK) {
-            printf("extended.\n");
             cpu->sext = immed | OFFSET9_SIGN_EXTEND;
          } else {
             cpu->sext = immed;  
